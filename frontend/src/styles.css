@@ -71,6 +71,37 @@
   --card: #FFFFFF;
   --card-foreground: #123052;
   --ring: #328B86;
+
+  /* Healthcare Status Tokens */
+  --status-low: #248261;
+  --status-moderate: #9B6C28;
+  --status-high: #D97706;
+  --status-urgent: #DC2626;
+
+  --color-status-low: #248261;
+  --color-status-moderate: #9B6C28;
+  --color-status-high: #D97706;
+  --color-status-urgent: #DC2626;
+  --color-primary: #123052;
+  --color-border: #DCE7E2;
+  --color-muted-foreground: #5A6E82;
+
+  --brand-soft: #EAF5F1;
+  --brand-ink: #123052;
+  --sidebar-foreground: #123052;
+}
+
+@theme {
+  --color-navy: #123052;
+  --color-teal: #328B86;
+  --color-mint: #EAF5F1;
+  --color-brand-soft: #EAF5F1;
+  --color-brand-ink: #123052;
+  --color-status-low: #248261;
+  --color-status-moderate: #9B6C28;
+  --color-status-high: #D97706;
+  --color-status-urgent: #DC2626;
+  --color-sidebar-foreground: #123052;
 }
 
 /* ---------- Global Reset & Box Sizing ---------- */
@@ -326,6 +357,32 @@ p {
 
 .animate-subtle-pulse {
   animation: subtle-pulse 2.4s ease-in-out infinite;
+}
+
+/* ---------- Dashboard & Sidebar Design System ---------- */
+
+.sahyog-app {
+  background-color: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.sahyog-sidebar {
+  background-color: var(--white);
+  border-right: 1px solid var(--border);
+  box-shadow: 1px 0 12px rgba(18, 48, 82, 0.03);
+}
+
+.sahyog-nav-active {
+  background-color: var(--mint) !important;
+  color: var(--navy) !important;
+  font-weight: 700;
+  border-left: 3px solid var(--teal);
+}
+
+.sahyog-nav-active:hover {
+  background-color: var(--mint-light) !important;
+  color: var(--teal-dark) !important;
 }
 
 /* ---------- Reduced Motion Accessibility ---------- */

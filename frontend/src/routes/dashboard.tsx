@@ -62,8 +62,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { assessDemonstration, type AssessmentOutcome } from "@/lib/assessment-service";
 import {
-  assessDemonstration,
   defaultScoreSettings,
   initialCases,
   initialReferrals,
@@ -74,6 +74,7 @@ import {
   type DemoReferral,
   type Priority,
   type ReferralCategory,
+  type ReferralStatus,
   type ReviewStatus,
   type ScoreSettings,
   type ThresholdKey,
@@ -130,12 +131,7 @@ function SahyogApp() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileNav, setMobileNav] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
-  const [assessment, setAssessment] = useState<{
-    score: number;
-    priority: Priority;
-    indicators: DemoCase["indicators"];
-    humanReviewRequired: true;
-  } | null>(null);
+  const [assessment, setAssessment] = useState<AssessmentOutcome | null>(null);
   const [assessmentNarrative, setAssessmentNarrative] = useState("");
   const [toast, setToast] = useState("");
 
@@ -274,28 +270,56 @@ function SahyogApp() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <a
+                href="/"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-semibold text-foreground transition hover:border-[#328B86] hover:bg-[#EAF5F1]"
+                title="Return to Public Homepage"
+              >
+                <Home className="size-3.5 text-muted-foreground" />
+                <span className="hidden md:inline">Homepage</span>
+              </a>
+
+              {view !== "New Assessment" && (
+                <Button
+                  size="sm"
+                  onClick={() => navigate("New Assessment")}
+                  className="h-8 gap-1.5 rounded-lg bg-[#123052] px-3 text-xs font-semibold text-white shadow-xs hover:bg-[#1A406D]"
+                >
+                  <FilePlus2 className="size-3.5" />
+                  <span className="hidden sm:inline">New Assessment</span>
+                </Button>
+              )}
+
               <Badge
                 variant="outline"
-                className="inline-flex gap-1 border-status-moderate/30 bg-status-moderate/10 px-1.5 text-[9px] text-status-moderate sm:gap-1.5 sm:px-2 sm:text-[10px]"
+                className="inline-flex gap-1 border-status-moderate/30 bg-status-moderate/10 px-2 py-1 text-[10px] text-status-moderate"
               >
                 <span className="size-1.5 shrink-0 rounded-full bg-status-moderate" />
-                <span className="sm:hidden">DEMO</span>
-                <span className="hidden sm:inline">DEMONSTRATION</span>
+                <span>NHAAS 14566 DEMO</span>
               </Badge>
+
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label="Notifications"
-                onClick={() => notify("You are viewing a fictional demonstration workspace.")}
+                className="size-8"
+                onClick={() =>
+                  notify(
+                    "Triage alert: All pending cases synchronized. 14566 Protocol active.",
+                  )
+                }
               >
-                <Bell />
+                <Bell className="size-4 text-muted-foreground" />
               </Button>
+
               <div className="hidden h-7 w-px bg-border sm:block" />
+
               <div className="hidden text-right sm:block">
-                <p className="text-xs font-medium">Demo Responder</p>
-                <p className="text-[11px] text-muted-foreground">Support team</p>
+                <p className="text-xs font-bold text-foreground">Demo Responder</p>
+                <p className="text-[10px] text-muted-foreground">Trained Social Responder</p>
               </div>
-              <div className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-semibold text-brand-ink">
+
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EAF5F1] text-xs font-bold text-[#123052]">
                 DR
               </div>
             </div>
@@ -962,6 +986,7 @@ function AssessmentPage({
         narrative: sourceText,
         indicators: mock.indicators,
         notes: "",
+        followUpDate: "",
         history: [`${date} · Rule-based demonstration run · Human review required`],
       };
       onSubmitCase(created);
@@ -982,12 +1007,12 @@ function AssessmentPage({
         reports. This prototype does not use AI and does not provide clinical assessment.
       </DemoNotice>
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(310px,0.85fr)]">
-        <form onSubmit={submit} className="space-y-5 border border-border bg-card p-4 sm:p-6">
+        <form onSubmit={submit} className="space-y-5 rounded-2xl border border-[#DCE7E2] bg-white p-5 sm:p-7 shadow-xs">
           <div className="flex items-center gap-2 border-b border-border pb-4">
-            <span className="grid size-7 place-items-center rounded-full bg-brand-soft text-xs font-semibold text-brand-ink">
+            <span className="grid size-7 place-items-center rounded-full bg-[#EAF5F1] text-xs font-bold text-[#123052]">
               1
             </span>
-            <h3 className="text-sm font-semibold">Complaint details</h3>
+            <h3 className="text-sm font-bold text-[#123052]">Case & Intake details</h3>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-xs font-medium">
@@ -1106,31 +1131,31 @@ function AssessmentPage({
           </Button>
         </form>
         <div className="space-y-5">
-          <section className="border border-border bg-card">
+          <section className="rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden">
             <SectionHeading title="Prepared scenarios" caption="Load a fictional narrative" />
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-[#DCE7E2]">
               {preparedScenarios.map((scenario, index) => (
                 <button
                   type="button"
                   key={scenario.id}
                   onClick={() => selectScenario(scenario.narrative)}
-                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted/30"
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[#EAF5F1]/50"
                 >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-sm border border-border text-[10px] font-semibold text-muted-foreground">
+                  <span className="grid size-7 shrink-0 place-items-center rounded-lg border border-[#DCE7E2] bg-[#FCFBF8] text-[10px] font-semibold text-[#123052]">
                     0{index + 1}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-medium">{scenario.title}</span>
-                    <span className="mt-1 block truncate text-[10px] text-muted-foreground">
+                    <span className="block text-xs font-semibold text-[#123052]">{scenario.title}</span>
+                    <span className="mt-0.5 block truncate text-[11px] text-[#5A6E82]">
                       {scenario.narrative}
                     </span>
                   </span>
-                  <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+                  <ArrowRight className="size-4 shrink-0 text-[#328B86]" />
                 </button>
               ))}
             </div>
           </section>
-          <section className="border border-border bg-card">
+          <section className="rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden">
             <SectionHeading title="Transparent demonstration rules" />
             <div className="space-y-3 p-4">
               <p className="text-[11px] leading-5 text-muted-foreground">
@@ -1141,7 +1166,7 @@ function AssessmentPage({
                 {(["fear", "duration", "safety", "overwhelm"] as const).map((key) => (
                   <div
                     key={key}
-                    className="flex items-center gap-2 border border-border px-2.5 py-2 text-[10px]"
+                    className="flex items-center gap-2 border border-[#DCE7E2] rounded-lg px-2.5 py-2 text-[10px]"
                   >
                     <span className="size-1.5 rounded-full bg-primary" />
                     {key === "fear"
@@ -1185,7 +1210,7 @@ function AssessmentResult({
   onOpen: () => void;
   onNotify: (message: string) => void;
 }) {
-  const displayEvidence = result.indicators.length
+  const displayEvidence: { label: string; evidence: string }[] = result.indicators.length
     ? result.indicators
     : [
         {
@@ -1194,7 +1219,7 @@ function AssessmentResult({
         },
       ];
   return (
-    <section className="mt-6 border border-border bg-card" aria-live="polite">
+    <section className="mt-6 rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden" aria-live="polite">
       <SectionHeading
         title="Illustrative assessment result"
         caption="Generated from transparent demonstration rules only"
@@ -1256,9 +1281,57 @@ function AssessmentResult({
               </div>
             </div>
           </div>
+
+          {result.suggestedQuestions && result.suggestedQuestions.length > 0 && (
+            <div className="mt-5 border-t border-border pt-4">
+              <h4 className="flex items-center gap-2 text-xs font-bold text-primary">
+                <HeartHandshake className="size-4 text-teal-600" />
+                Suggested Responder Follow-up Questions
+              </h4>
+              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                {result.suggestedQuestions.map((q, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/20 p-3 text-xs leading-relaxed"
+                  >
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                      {idx + 1}
+                    </span>
+                    <span className="text-foreground">{q}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {result.missingInformation && result.missingInformation.length > 0 && (
+            <div className="mt-4 rounded-xl border border-[#DCE7E2] bg-[#FCFBF8] p-3.5 text-xs text-[#5A6E82]">
+              <p className="font-bold text-[#123052] text-[11px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Info className="size-3.5 text-[#328B86]" />
+                Assessment Context & Limitations
+              </p>
+              <ul className="list-disc pl-4 space-y-1 text-[11px]">
+                {result.missingInformation.map((info, idx) => (
+                  <li key={idx}>{info}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button size="sm" onClick={onOpen}>
               Open case <ArrowRight />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const summary = `SAHYOG AI Assessment\nPriority: ${result.priority} (SVI: ${result.score}/100)\nIndicators: ${result.indicators.map((i) => i.label).join(", ") || "No matches"}\nNarrative: "${narrative}"`;
+                navigator.clipboard?.writeText(summary);
+                onNotify("Clinical summary copied to clipboard.");
+              }}
+            >
+              Copy Summary
             </Button>
             <Button
               size="sm"
@@ -1679,7 +1752,11 @@ function ReferralsPage({
       id,
       caseId,
       category,
-      status: "Pending",
+      status: "Awaiting human approval",
+      service: "Support referral intake",
+      followUpDate: "",
+      notes: "Initiated via referral center",
+      outcome: "Awaiting responder review",
       date: new Date().toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
@@ -1688,7 +1765,7 @@ function ReferralsPage({
     });
     setShowForm(false);
     setError("");
-    onNotify("Mock referral created as Pending. No external service was contacted.");
+    onNotify("Mock referral created. Awaiting human responder review.");
   };
   return (
     <>
