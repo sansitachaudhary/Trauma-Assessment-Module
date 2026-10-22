@@ -1,5 +1,5 @@
 
-from app.services.text_analysis import analyze_text
+from backend.app.services.text_analysis import analyze_text
 
 
 def test_distress_phrase_is_flagged_for_review():

@@ -1,8 +1,8 @@
 
 from sqlalchemy import inspect
 
-from app.db.database import Base, engine
-from app.models import Case, Assessment
+from backend.app.db.database import Base, engine
+from backend.app.models import Case, Assessment
 
 
 def create_tables():

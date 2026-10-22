@@ -1,0 +1,342 @@
+/* =========================================
+   SAHYOG AI — GLOBAL DESIGN SYSTEM
+   Human-Centred Healthcare Technology
+   ========================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Manrope:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Design Tokens ---------- */
+
+:root {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #123052;
+  background: #FCFBF8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Primary Brand Theme */
+  --navy: #123052;
+  --navy-dark: #0A1C30;
+  --navy-light: #1A406D;
+  --navy-hover: #183A64;
+  --teal: #328B86;
+  --teal-dark: #236C68;
+  --teal-light: #44A7A2;
+  --teal-glow: rgba(50, 139, 134, 0.18);
+  --mint: #EAF5F1;
+  --mint-light: #F4FAF7;
+  --mint-dark: #D4E8E1;
+  --cream: #FCFBF8;
+  --white: #FFFFFF;
+  --text: #123052;
+  --muted: #5A6E82;
+  --muted-light: #8CA0B3;
+  --border: #DCE7E2;
+  --border-light: #EBF2EE;
+  
+  /* Restrained Amber for Safety / Human Factors */
+  --amber: #9B6C28;
+  --amber-dark: #78511B;
+  --amber-bg: #FCF8EE;
+  --amber-border: #E8DAC0;
+
+  /* Elevation Shadows */
+  --shadow-xs: 0 1px 3px rgba(18, 48, 82, 0.04);
+  --shadow-sm: 0 4px 12px rgba(18, 48, 82, 0.05);
+  --shadow-md: 0 10px 28px rgba(18, 48, 82, 0.07);
+  --shadow-lg: 0 20px 50px -10px rgba(18, 48, 82, 0.11);
+  --shadow-glow: 0 0 32px rgba(50, 139, 134, 0.14);
+
+  /* Radius Tokens */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* Compatibility Tokens */
+  --background: #FCFBF8;
+  --foreground: #123052;
+  --primary: #123052;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EAF5F1;
+  --secondary-foreground: #123052;
+  --card: #FFFFFF;
+  --card-foreground: #123052;
+  --ring: #328B86;
+}
+
+/* ---------- Global Reset & Box Sizing ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 86px;
+  min-width: 320px;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+::selection {
+  color: var(--navy);
+  background: #CBE6DF;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* ---------- Headings & Typography ---------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  color: var(--navy);
+  font-family: "Manrope", sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+}
+
+h2 {
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin-top: 0;
+  line-height: 1.75;
+}
+
+/* ---------- Semantic Layout Utilities ---------- */
+
+.sahyog-container {
+  width: 100%;
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.25rem, 4vw, 3.5rem);
+  padding-right: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* Section Kickers / Eyebrows */
+.sahyog-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--teal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* ---------- Buttons & Interactive Elements ---------- */
+
+.sahyog-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  background-color: var(--navy);
+  color: var(--white);
+  border: 1px solid var(--navy);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.sahyog-btn-primary:hover {
+  background-color: var(--navy-light);
+  border-color: var(--navy-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--white);
+}
+
+.sahyog-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  background-color: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.sahyog-btn-secondary:hover {
+  border-color: var(--teal);
+  background-color: var(--mint-light);
+  color: var(--teal-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.sahyog-btn-mint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  background-color: var(--mint);
+  color: var(--navy);
+  border: 1px solid var(--mint-dark);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.sahyog-btn-mint:hover {
+  background-color: var(--white);
+  border-color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Card Styles & Hover Effects ---------- */
+
+.sahyog-card {
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sahyog-card:hover {
+  border-color: #B8D8CD;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.sahyog-dark-card {
+  background-color: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  transition: all 200ms ease;
+}
+
+.sahyog-dark-card:hover {
+  background-color: rgba(255, 255, 255, 0.095);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* ---------- Approach Diagram Styles ---------- */
+
+.approach-card {
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.flow-connector-line {
+  stroke: #9BC9C0;
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+
+/* Pulse animation for status dots */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 2.4s ease-in-out infinite;
+}
+
+/* ---------- Reduced Motion Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
