@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import "./dashboard.css";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   Activity,
@@ -7,6 +8,7 @@ import {
   ArrowRight,
   Bell,
   BookOpen,
+  BrainCircuit,
   BriefcaseBusiness,
   Check,
   CheckCircle2,
@@ -23,6 +25,7 @@ import {
   Info,
   Languages,
   LifeBuoy,
+  LockKeyhole,
   Menu,
   MessageSquareText,
   PanelLeftClose,
@@ -62,7 +65,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { assessDemonstration, type AssessmentOutcome } from "@/lib/assessment-service";
+import {
+  assessDemonstration,
+  type AssessmentOutcome,
+} from "@/lib/assessment-service";
 import {
   defaultScoreSettings,
   initialCases,
@@ -89,7 +95,10 @@ export const Route = createFileRoute("/dashboard")({
         content:
           "A fictional, human-led case management prototype for support services. Illustrative demonstration data only.",
       },
-      { property: "og:title", content: "SAHYOG AI — Distress Assessment & Human Support" },
+      {
+        property: "og:title",
+        content: "SAHYOG AI — Distress Assessment & Human Support",
+      },
       {
         property: "og:description",
         content:
@@ -119,7 +128,11 @@ const navigation: {
   { label: "New Assessment", icon: FilePlus2, group: "WORKSPACE" },
   { label: "Case Management", icon: BriefcaseBusiness, group: "WORKSPACE" },
   { label: "Referrals", icon: HeartHandshake, group: "WORKSPACE" },
-  { label: "Reports", icon: FileChartColumnIncreasing, group: "ADMINISTRATION" },
+  {
+    label: "Reports",
+    icon: FileChartColumnIncreasing,
+    group: "ADMINISTRATION",
+  },
   { label: "Settings", icon: Settings2, group: "ADMINISTRATION" },
 ];
 
@@ -150,8 +163,13 @@ function SahyogApp() {
     setView("Case detail");
     setMobileNav(false);
   };
-  const addCase = (item: DemoCase) => setCases((existing) => [item, ...existing]);
-  const updateCase = (id: string, updates: Partial<DemoCase>, historyMessage?: string) => {
+  const addCase = (item: DemoCase) =>
+    setCases((existing) => [item, ...existing]);
+  const updateCase = (
+    id: string,
+    updates: Partial<DemoCase>,
+    historyMessage?: string,
+  ) => {
     setCases((existing) =>
       existing.map((item) =>
         item.id === id
@@ -235,7 +253,9 @@ function SahyogApp() {
               <>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">Demo Responder</p>
-                  <p className="mt-0.5 text-xs text-sidebar-foreground/60">Prototype workspace</p>
+                  <p className="mt-0.5 text-xs text-sidebar-foreground/60">
+                    Prototype workspace
+                  </p>
                 </div>
                 <ChevronDown className="size-4 shrink-0 text-sidebar-foreground/50" />
               </>
@@ -265,7 +285,9 @@ function SahyogApp() {
                   {view === "Case detail" ? "Case details" : view}
                 </p>
                 <h1 className="mt-0.5 truncate text-lg font-semibold">
-                  {view === "Case detail" ? (selectedCase?.id ?? "Case details") : view}
+                  {view === "Case detail"
+                    ? (selectedCase?.id ?? "Case details")
+                    : view}
                 </h1>
               </div>
             </div>
@@ -315,8 +337,12 @@ function SahyogApp() {
               <div className="hidden h-7 w-px bg-border sm:block" />
 
               <div className="hidden text-right sm:block">
-                <p className="text-xs font-bold text-foreground">Demo Responder</p>
-                <p className="text-[10px] text-muted-foreground">Trained Social Responder</p>
+                <p className="text-xs font-bold text-foreground">
+                  Demo Responder
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Trained Social Responder
+                </p>
               </div>
 
               <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EAF5F1] text-xs font-bold text-[#123052]">
@@ -366,11 +392,15 @@ function SahyogApp() {
               setNarrative={setAssessmentNarrative}
             />
           )}
-          {view === "Case Management" && <CasesPage cases={cases} onOpenCase={openCase} />}
+          {view === "Case Management" && (
+            <CasesPage cases={cases} onOpenCase={openCase} />
+          )}
           {view === "Case detail" && selectedCase && (
             <CaseDetailPage
               item={selectedCase}
-              referrals={referrals.filter((referral) => referral.caseId === selectedCase.id)}
+              referrals={referrals.filter(
+                (referral) => referral.caseId === selectedCase.id,
+              )}
               onBack={() => navigate("Case Management")}
               onUpdate={updateCase}
               onNavigate={navigate}
@@ -384,7 +414,9 @@ function SahyogApp() {
               onAdd={addReferral}
               onUpdate={(id, status) => {
                 setReferrals((items) =>
-                  items.map((item) => (item.id === id ? { ...item, status } : item)),
+                  items.map((item) =>
+                    item.id === id ? { ...item, status } : item,
+                  ),
                 );
                 notify(
                   `Mock referral status updated to ${status}. No external service was contacted.`,
@@ -393,12 +425,17 @@ function SahyogApp() {
               onNotify={notify}
             />
           )}
-          {view === "Reports" && <ReportsPage cases={cases} referrals={referrals} />}
-          {view === "Settings" && <SettingsPage settings={settings} setSettings={setSettings} />}
+          {view === "Reports" && (
+            <ReportsPage cases={cases} referrals={referrals} />
+          )}
+          {view === "Settings" && (
+            <SettingsPage settings={settings} setSettings={setSettings} />
+          )}
         </div>
         <footer className="mx-4 border-t border-border py-5 text-center text-[11px] text-muted-foreground sm:mx-7 lg:mx-9">
-          <span className="font-medium text-foreground">Prototype only.</span> Fictional records and
-          rule-based illustrative indicators—not clinical advice or a validated assessment.
+          <span className="font-medium text-foreground">Prototype only.</span>{" "}
+          Fictional records and rule-based illustrative indicators—not clinical
+          advice or a validated assessment.
         </footer>
       </main>
       {toast && (
@@ -414,7 +451,13 @@ function SahyogApp() {
   );
 }
 
-function BrandBlock({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+function BrandBlock({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
   return (
     <div
       className={`flex items-center border-b border-sidebar-foreground/10 py-[19px] ${collapsed ? "justify-center px-2" : "gap-3 px-6"}`}
@@ -425,9 +468,12 @@ function BrandBlock({ collapsed, onToggle }: { collapsed: boolean; onToggle: () 
       {!collapsed && (
         <div className="min-w-0 flex-1">
           <p className="text-[14px] font-bold tracking-[0.1em]">
-            SAHYOG <span className="font-medium text-sidebar-foreground/70">AI</span>
+            SAHYOG{" "}
+            <span className="font-medium text-sidebar-foreground/70">AI</span>
           </p>
-          <p className="mt-0.5 text-[10px] text-sidebar-foreground/55">Human support workspace</p>
+          <p className="mt-0.5 text-[10px] text-sidebar-foreground/55">
+            Human support workspace
+          </p>
         </div>
       )}
       <Button
@@ -502,11 +548,15 @@ function PageIntro({
   return (
     <div className="mb-7 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
       <div className="min-w-0">
-        <p className="mb-2 text-[10px] font-semibold tracking-[0.16em] text-primary">{eyebrow}</p>
+        <p className="mb-2 text-[10px] font-semibold tracking-[0.16em] text-primary">
+          {eyebrow}
+        </p>
         <h2 className="text-[25px] font-semibold leading-tight tracking-normal sm:text-[29px]">
           {title}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>
@@ -546,9 +596,13 @@ function StatCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{label}</p>
-          <p className="mt-2 text-[27px] font-semibold tabular-nums leading-none">{value}</p>
+          <p className="mt-2 text-[27px] font-semibold tabular-nums leading-none">
+            {value}
+          </p>
         </div>
-        <div className={`grid size-9 shrink-0 place-items-center rounded-md ${toneClasses[tone]}`}>
+        <div
+          className={`grid size-9 shrink-0 place-items-center rounded-md ${toneClasses[tone]}`}
+        >
           <Icon className="size-[17px]" />
         </div>
       </div>
@@ -567,7 +621,10 @@ function StatusBadge({ status }: { status: string }) {
           ? "border-status-moderate/25 bg-status-moderate/10 text-status-moderate"
           : "border-status-high/20 bg-status-high/10 text-status-high";
   return (
-    <Badge variant="outline" className={`whitespace-nowrap rounded-sm font-medium ${cls}`}>
+    <Badge
+      variant="outline"
+      className={`whitespace-nowrap rounded-sm font-medium ${cls}`}
+    >
       <span className="mr-1.5 size-1.5 rounded-full bg-current" />
       {status}
     </Badge>
@@ -584,7 +641,10 @@ function PriorityBadge({ priority }: { priority: Priority }) {
           ? "border-status-moderate/25 bg-status-moderate/10 text-status-moderate"
           : "border-status-low/25 bg-status-low/10 text-status-low";
   return (
-    <Badge variant="outline" className={`whitespace-nowrap rounded-sm font-medium ${cls}`}>
+    <Badge
+      variant="outline"
+      className={`whitespace-nowrap rounded-sm font-medium ${cls}`}
+    >
       {priority}
     </Badge>
   );
@@ -603,7 +663,9 @@ function SectionHeading({
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
       <div>
         <h3 className="text-sm font-semibold">{title}</h3>
-        {caption && <p className="mt-1 text-[11px] text-muted-foreground">{caption}</p>}
+        {caption && (
+          <p className="mt-1 text-[11px] text-muted-foreground">{caption}</p>
+        )}
       </div>
       {action}
     </div>
@@ -645,12 +707,16 @@ function CaseTable({
                   {item.id}
                 </Button>
               </td>
-              <td className="whitespace-nowrap px-4 py-3.5 text-muted-foreground">{item.date}</td>
+              <td className="whitespace-nowrap px-4 py-3.5 text-muted-foreground">
+                {item.date}
+              </td>
               <td className="px-4 py-3.5 text-foreground">{item.language}</td>
               <td className="px-4 py-3.5">
                 <StatusBadge status={item.status} />
               </td>
-              <td className="px-4 py-3.5 text-muted-foreground">{item.assigned}</td>
+              <td className="px-4 py-3.5 text-muted-foreground">
+                {item.assigned}
+              </td>
               <td className="px-4 py-3.5">
                 <PriorityBadge priority={item.priority} />
               </td>
@@ -689,10 +755,15 @@ function OverviewPage({
   onNavigate: (view: View) => void;
   onOpenCase: (id: string) => void;
 }) {
-  const pending = cases.filter((item) => item.status === "Pending review").length;
-  const urgent = cases.filter(
+  const pendingCases = cases.filter((item) => item.status === "Pending review");
+  const urgentCases = cases.filter(
     (item) => item.priority === "Urgent review" && item.status !== "Reviewed",
-  ).length;
+  );
+  const activeReferrals = referrals.filter((item) => item.status !== "Completed");
+  const needsAttention = [...urgentCases, ...pendingCases.filter(
+    (item) => !urgentCases.some((urgentCase) => urgentCase.id === item.id),
+  )].slice(0, 4);
+
   const trend = [
     { month: "May", count: 18 },
     { month: "Jun", count: 24 },
@@ -701,211 +772,125 @@ function OverviewPage({
     { month: "Sep", count: 26 },
     { month: "Oct", count: cases.length + 8 },
   ];
+
   const categories = [
-    {
-      name: "Low",
-      value: cases.filter((item) => item.priority === "Low").length,
-      fill: "var(--color-status-low)",
-    },
-    {
-      name: "Moderate",
-      value: cases.filter((item) => item.priority === "Moderate").length,
-      fill: "var(--color-status-moderate)",
-    },
-    {
-      name: "High",
-      value: cases.filter((item) => item.priority === "High").length,
-      fill: "var(--color-status-high)",
-    },
-    {
-      name: "Urgent review",
-      value: cases.filter((item) => item.priority === "Urgent review").length,
-      fill: "var(--color-status-urgent)",
-    },
+    { name: "Low", value: cases.filter((item) => item.priority === "Low").length, fill: "#24856f" },
+    { name: "Moderate", value: cases.filter((item) => item.priority === "Moderate").length, fill: "#c58a22" },
+    { name: "High", value: cases.filter((item) => item.priority === "High").length, fill: "#d86f43" },
+    { name: "Urgent review", value: cases.filter((item) => item.priority === "Urgent review").length, fill: "#c74755" },
   ];
+
   return (
-    <>
-      <PageIntro
-        eyebrow="MONDAY, 19 OCTOBER 2026 · WORKSPACE OVERVIEW"
-        title="Good morning, responder"
-        description="A clear view of the support queue and the people who need a human response."
-        action={
-          <Button onClick={() => onNavigate("New Assessment")} className="gap-2">
-            <Plus /> <span className="hidden sm:inline">New assessment</span>
-            <span className="sm:hidden">New</span>
-          </Button>
-        }
-      />
-      <DemoNotice>
-        <strong>Synthetic demonstration data.</strong> Every figure and case shown is fictional and
-        for interface demonstration only—not validated assessment results.
-      </DemoNotice>
-      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <StatCard
-          label="Active cases"
-          value={cases.length}
-          sub="Across the demonstration queue"
-          icon={BriefcaseBusiness}
-        />
-        <StatCard
-          label="Pending human reviews"
-          value={pending}
-          sub="Awaiting responder attention"
-          icon={UsersRound}
-          tone="amber"
-        />
-        <StatCard
-          label="High-priority reviews"
-          value={urgent}
-          sub="Human review is always required"
-          icon={ShieldAlert}
-          tone="red"
-        />
-        <StatCard
-          label="Referrals in progress"
-          value={referrals.filter((item) => item.status !== "Completed").length}
-          sub="Mock referrals only · no external action"
-          icon={HeartHandshake}
-          tone="green"
-        />
-      </div>
-      <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.8fr)]">
-        <section className="border border-border bg-card">
-          <SectionHeading
-            title="Case volumes"
-            caption="Illustrative number of cases · May–October 2026"
-            action={
-              <Badge variant="outline" className="rounded-sm text-[10px]">
-                MOCK DATA
-              </Badge>
-            }
-          />
-          <div className="h-[235px] p-4 pt-5">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trend} margin={{ top: 5, right: 6, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.17} />
-                    <stop offset="90%" stopColor="var(--color-primary)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  vertical={false}
-                  stroke="var(--color-border)"
-                  strokeDasharray="3 4"
-                />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderColor: "var(--color-border)",
-                    borderRadius: 4,
-                    fontSize: 12,
-                  }}
-                />
-                <Area
-                  dataKey="count"
-                  type="monotone"
-                  stroke="var(--color-primary)"
-                  strokeWidth={2}
-                  fill="url(#volumeFill)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-        <section className="border border-border bg-card">
-          <SectionHeading
-            title="Illustrative indicators"
-            caption="Rule-based categories across mock cases"
-          />
-          <div className="grid grid-cols-[130px_minmax(0,1fr)] items-center gap-2 px-3 py-2 sm:grid-cols-[145px_minmax(0,1fr)]">
-            <div className="relative h-[160px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categories}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={47}
-                    outerRadius={66}
-                    paddingAngle={2}
-                    strokeWidth={0}
-                  >
-                    {categories.map((item) => (
-                      <Cell key={item.name} fill={item.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-                <div>
-                  <p className="text-xl font-semibold">{cases.length}</p>
-                  <p className="text-[9px] text-muted-foreground">CASES</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2 pr-2">
-              {categories.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between gap-2 text-[11px]"
-                >
-                  <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
-                    <span
-                      className="size-2 shrink-0 rounded-sm"
-                      style={{ backgroundColor: item.fill }}
-                    />
-                    {item.name}
-                  </span>
-                  <span className="font-medium tabular-nums">{item.value}</span>
-                </div>
-              ))}
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-2xl border border-[#d6e7e3] bg-gradient-to-br from-white via-[#f3faf8] to-[#eaf4f5] p-5 shadow-sm sm:p-7">
+        <div className="pointer-events-none absolute -right-12 -top-20 size-64 rounded-full border-[28px] border-white/70" />
+        <div className="pointer-events-none absolute right-24 top-24 size-24 rounded-full bg-[#d9efea]/70 blur-2xl" />
+        <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-bold tracking-tight text-[#153653] sm:text-3xl">A clearer view of the support queue.</h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#526b80]">
+              Review the current workload, spot cases awaiting a human response, and coordinate follow-up—all in one place.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium text-[#355a70]">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><ShieldCheck className="size-4 text-[#24856f]" /> Human-led decisions</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><LockKeyhole className="size-4 text-[#24856f]" /> Respectful by design</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><Activity className="size-4 text-[#24856f]" /> Illustrative demo data</span>
             </div>
           </div>
-          <div className="border-t border-border px-4 py-2.5 text-[10px] text-muted-foreground">
-            Categories are illustrative—not validated model performance.
-          </div>
-        </section>
-      </div>
-      <section className="mt-5 border border-border bg-card">
-        <SectionHeading
-          title="Recent cases"
-          caption="Fictional case records · review state is editable"
-          action={
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden gap-2 sm:inline-flex"
-              onClick={() => onNavigate("Case Management")}
-            >
-              All cases <ArrowRight />
+          <div className="relative flex shrink-0 flex-wrap gap-2">
+            <Button variant="outline" onClick={() => onNavigate("Case Management")} className="gap-2 border-[#c8dcd8] bg-white text-[#183b56] hover:bg-[#f3faf8]">
+              <ClipboardList className="size-4" /> View case queue
             </Button>
-          }
-        />
-        <CaseTable cases={cases} onOpenCase={onOpenCase} compact />
-        <div className="border-t border-border px-4 py-3 sm:hidden">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={() => onNavigate("Case Management")}
-          >
-            View all cases <ArrowRight />
-          </Button>
+          </div>
+        </div>
+      </div>
+
+      <section aria-label="Workspace statistics" className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+        <div className="group rounded-xl border border-[#d9e7e5] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Active cases</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{cases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]"><BriefcaseBusiness className="size-5" /></span></div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Across the demo queue</span><button className="text-[11px] font-bold text-[#167d70] hover:underline" onClick={() => onNavigate("Case Management")}>View queue <ArrowRight className="ml-1 inline size-3.5" /></button></div>
+        </div>
+        <div className="group rounded-xl border border-[#eadfbe] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Pending human reviews</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{pendingCases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#fff4d9] text-[#a76c0d]"><UsersRound className="size-5" /></span></div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Awaiting responder attention</span><span className="rounded-full bg-[#fff4d9] px-2 py-1 text-[10px] font-bold text-[#94600d]">Needs review</span></div>
+        </div>
+        <div className="group rounded-xl border border-[#f0d6d8] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">High-priority reviews</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{urgentCases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#ffebed] text-[#c74755]"><ShieldAlert className="size-5" /></span></div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Human review required</span><span className="rounded-full bg-[#ffebed] px-2 py-1 text-[10px] font-bold text-[#b53b49]">Prioritise</span></div>
+        </div>
+        <div className="group rounded-xl border border-[#d9e7e5] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Referrals in progress</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{activeReferrals.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#e8f5ed] text-[#24805b]"><HeartHandshake className="size-5" /></span></div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Mock referrals only</span><button className="text-[11px] font-bold text-[#167d70] hover:underline" onClick={() => onNavigate("Referrals")}>View referrals <ArrowRight className="ml-1 inline size-3.5" /></button></div>
         </div>
       </section>
-    </>
+
+      <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.5fr)_minmax(330px,0.85fr)]">
+        <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
+          <SectionHeading title="Case activity" caption="Illustrative case volumes · May–October 2026" action={<Badge variant="outline" className="border-[#d8e6e3] bg-[#f4faf8] text-[10px] text-[#427064]">DEMO DATA</Badge>} />
+          <div className="px-3 pb-4 pt-2 sm:px-5">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><p className="text-xs text-[#61788a]">Volume overview</p><p className="text-[10px] text-[#8092a0]">Illustrative values, not live operational metrics</p></div>
+            <div className="h-[245px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trend} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
+                  <defs><linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#238b80" stopOpacity={0.28} /><stop offset="95%" stopColor="#238b80" stopOpacity={0.02} /></linearGradient></defs>
+                  <CartesianGrid vertical={false} stroke="#e6eeec" strokeDasharray="4 5" />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: "#718697", fontSize: 11 }} tickMargin={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: "#718697", fontSize: 11 }} width={34} />
+                  <Tooltip contentStyle={{ borderColor: "#dce7e5", borderRadius: 10, fontSize: 12, boxShadow: "0 8px 24px rgba(20,50,70,.08)" }} />
+                  <Area dataKey="count" name="Illustrative cases" type="monotone" stroke="#238b80" strokeWidth={3} fill="url(#volumeFill)" activeDot={{ r: 5, strokeWidth: 0, fill: "#153653" }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
+          <SectionHeading title="Priority distribution" caption="Rule-based categories across mock cases" action={<span className="rounded-lg bg-[#f2f8f6] px-2.5 py-1 text-[10px] font-semibold text-[#507366]">{cases.length} total</span>} />
+          <div className="grid grid-cols-[138px_minmax(0,1fr)] items-center gap-1 px-3 py-3 sm:grid-cols-[155px_minmax(0,1fr)] sm:px-4">
+            <div className="relative h-[175px]">
+              <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categories} dataKey="value" nameKey="name" innerRadius={49} outerRadius={70} paddingAngle={3} stroke="#fff" strokeWidth={3}>{categories.map((item) => <Cell key={item.name} fill={item.fill} />)}</Pie><Tooltip /></PieChart></ResponsiveContainer>
+              <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-2xl font-bold text-[#153653]">{cases.length}</p><p className="mt-0.5 text-[9px] font-semibold tracking-[0.12em] text-[#738797]">CASES</p></div></div>
+            </div>
+            <div className="space-y-3 pr-1">
+              {categories.map((item) => <div key={item.name} className="flex items-center justify-between gap-2"><span className="flex min-w-0 items-center gap-2 text-[11px] text-[#536d80]"><span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: item.fill }} />{item.name}</span><span className="text-sm font-bold tabular-nums text-[#183b56]">{item.value}</span></div>)}
+            </div>
+          </div>
+          <div className="border-t border-[#edf2f1] bg-[#f8fbfa] px-4 py-3 text-[10px] leading-5 text-[#718697]">These categories are illustrative indicators only. They do not represent a validated model score or clinical judgement.</div>
+        </section>
+      </div>
+
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+        <section className="self-start overflow-hidden rounded-2xl border border-[#dce9e6] bg-white shadow-[0_8px_28px_rgba(21,54,83,0.045)]">
+          <SectionHeading title="Cases needing attention" caption="A focused queue for the next human review" action={<Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-[#d6e5e2] text-[#24566a] hover:bg-[#f2faf7]" onClick={() => onNavigate("Case Management")}>Open queue <ArrowRight className="size-3.5" /></Button>} />
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#edf2f1] bg-[#f8fbfa] px-4 py-3 sm:px-5">
+            <span className="text-xs text-[#607789]">Prioritise these records for review</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f3d4d7] bg-white px-2.5 py-1 text-[10px] font-bold text-[#b94350]"><span className="size-1.5 rounded-full bg-[#cf5260]" /> {needsAttention.length} requiring attention</span>
+          </div>
+          {needsAttention.length > 0 ? <div className="divide-y divide-[#edf2f1]">{needsAttention.map((item) => <button key={item.id} onClick={() => onOpenCase(item.id)} className="group flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f6fbf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2b9a87] sm:gap-4 sm:px-5"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-inset ${item.priority === "Urgent review" ? "bg-[#fff0f1] text-[#c74755] ring-[#f6d8dc]" : "bg-[#fff7e5] text-[#a76c0d] ring-[#f1e1b8]"}`}><ShieldAlert className="size-[18px]" /></span><span className="min-w-0 flex-1"><span className="flex flex-wrap items-center gap-2"><strong className="text-sm font-bold tracking-[-0.01em] text-[#183b56] group-hover:text-[#147c76]">{item.id}</strong><PriorityBadge priority={item.priority} /></span><span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#718697]"><span>{item.language}</span><span className="text-[#bdc9c8]">•</span><span>{item.assigned}</span></span></span><span className="hidden sm:block"><StatusBadge status={item.status} /></span><span className="grid size-8 shrink-0 place-items-center rounded-full text-[#76908f] transition group-hover:bg-white group-hover:text-[#167d70] group-hover:shadow-sm"><ChevronRight className="size-4" /></span></button>)}</div> : <div className="px-5 py-10 text-center"><span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#e8f6ef] text-[#24856f]"><CheckCircle2 className="size-6" /></span><p className="mt-3 text-sm font-semibold text-[#183b56]">No cases in this attention list</p><p className="mt-1 text-xs text-[#718697]">Check the full queue for the latest case status.</p></div>}
+          <div className="border-t border-[#edf2f1] px-4 py-3 text-[10px] leading-5 text-[#718697] sm:px-5">Priority labels are illustrative. Review each case's context and follow your organisation's protocols.</div>
+        </section>
+
+        <section className="self-start overflow-hidden rounded-2xl border border-[#dce9e6] bg-white shadow-[0_8px_28px_rgba(21,54,83,0.045)]">
+          <SectionHeading title="Workflow at a glance" caption="From listening to coordinated support" />
+          <div className="px-4 py-3 sm:px-5">
+            <div className="relative space-y-1">
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]"><MessageSquareText className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#24856f]">STEP 01</span><p className="text-sm font-bold text-[#183b56]">Listen and document</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Capture reported concerns respectfully and keep the person's context in view.</p></div></div>
+              <div className="ml-8 h-4 border-l-2 border-dotted border-[#c8dcd8]" />
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#edf0ff] text-[#6556a8]"><BrainCircuit className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#6556a8]">STEP 02</span><p className="text-sm font-bold text-[#183b56]">Organise for human review</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Structure information to support responders—not to make automatic decisions.</p></div></div>
+              <div className="ml-8 h-4 border-l-2 border-dotted border-[#c8dcd8]" />
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff1e7] text-[#b9683f]"><LifeBuoy className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#b9683f]">STEP 03</span><p className="text-sm font-bold text-[#183b56]">Coordinate appropriate support</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Track follow-up and referrals with trained people remaining responsible.</p></div></div>
+            </div>
+            <div className="mt-3 rounded-xl border border-[#d7ebe3] bg-gradient-to-br from-[#f0faf6] to-[#f8fbfa] p-3.5"><div className="flex items-start gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#24856f] shadow-sm"><ShieldCheck className="size-4" /></span><div><p className="text-xs font-bold text-[#1c5d55]">Human judgement stays central</p><p className="mt-1 text-[11px] leading-5 text-[#5e7b76]">SAHYOG AI supports a prototype workflow; it does not diagnose, validate risk, or contact external services.</p></div></div></div>
+          </div>
+        </section>
+      </div>
+
+      <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
+        <SectionHeading title="Recent cases" caption="Fictional case records · open a record to review its details" action={<Button variant="outline" size="sm" className="hidden gap-2 border-[#d6e5e2] text-[#24566a] sm:inline-flex" onClick={() => onNavigate("Case Management")}>All cases <ArrowRight className="size-4" /></Button>} />
+        <CaseTable cases={cases} onOpenCase={onOpenCase} compact />
+        <div className="border-t border-[#edf2f1] bg-[#fbfdfc] px-4 py-3 sm:hidden"><Button variant="outline" size="sm" className="w-full" onClick={() => onNavigate("Case Management")}>View all cases <ArrowRight className="size-4" /></Button></div>
+      </section>
+    </div>
   );
 }
 
@@ -924,7 +909,11 @@ function AssessmentPage({
   cases: DemoCase[];
   settings: ScoreSettings;
   onSubmitCase: (item: DemoCase) => void;
-  onUpdateCase: (id: string, updates: Partial<DemoCase>, history?: string) => void;
+  onUpdateCase: (
+    id: string,
+    updates: Partial<DemoCase>,
+    history?: string,
+  ) => void;
   onNavigate: (view: View) => void;
   onOpenCase: (id: string) => void;
   onNotify: (message: string) => void;
@@ -982,12 +971,15 @@ function AssessmentPage({
         assigned: "Unassigned",
         score: mock.score,
         priority: mock.priority,
-        summary: sourceText.slice(0, 110) + (sourceText.length > 110 ? "…" : ""),
+        summary:
+          sourceText.slice(0, 110) + (sourceText.length > 110 ? "…" : ""),
         narrative: sourceText,
         indicators: mock.indicators,
         notes: "",
         followUpDate: "",
-        history: [`${date} · Rule-based demonstration run · Human review required`],
+        history: [
+          `${date} · Rule-based demonstration run · Human review required`,
+        ],
       };
       onSubmitCase(created);
       setResult(mock);
@@ -1003,16 +995,22 @@ function AssessmentPage({
         description="Capture a fictional complaint narrative for a transparent, rule-based demonstration. A human responder remains responsible for every decision."
       />
       <DemoNotice>
-        <strong>Demonstration only.</strong> Do not enter real names, contact details, or personal
-        reports. This prototype does not use AI and does not provide clinical assessment.
+        <strong>Demonstration only.</strong> Do not enter real names, contact
+        details, or personal reports. This prototype does not use AI and does
+        not provide clinical assessment.
       </DemoNotice>
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(310px,0.85fr)]">
-        <form onSubmit={submit} className="space-y-5 rounded-2xl border border-[#DCE7E2] bg-white p-5 sm:p-7 shadow-xs">
+        <form
+          onSubmit={submit}
+          className="space-y-5 rounded-2xl border border-[#DCE7E2] bg-white p-5 sm:p-7 shadow-xs"
+        >
           <div className="flex items-center gap-2 border-b border-border pb-4">
             <span className="grid size-7 place-items-center rounded-full bg-[#EAF5F1] text-xs font-bold text-[#123052]">
               1
             </span>
-            <h3 className="text-sm font-bold text-[#123052]">Case & Intake details</h3>
+            <h3 className="text-sm font-bold text-[#123052]">
+              Case & Intake details
+            </h3>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-xs font-medium">
@@ -1052,7 +1050,9 @@ function AssessmentPage({
           <div>
             <div className="flex items-center justify-between gap-3">
               <label htmlFor="narrative" className="text-xs font-medium">
-                {mode === "Text" ? "Fictional complaint narrative" : "Fictional transcript"}{" "}
+                {mode === "Text"
+                  ? "Fictional complaint narrative"
+                  : "Fictional transcript"}{" "}
                 <span className="text-status-urgent">*</span>
               </label>
               <span className="text-[10px] text-muted-foreground">
@@ -1075,7 +1075,8 @@ function AssessmentPage({
               minLength={12}
             />
             <p className="mt-1.5 text-[10px] text-muted-foreground">
-              Use invented example wording only. A minimum of 12 characters is required.
+              Use invented example wording only. A minimum of 12 characters is
+              required.
             </p>
           </div>
           <div className="border border-dashed border-border bg-muted/20 p-4">
@@ -1086,12 +1087,16 @@ function AssessmentPage({
               <div>
                 <p className="text-xs font-medium">
                   Voice input{" "}
-                  <Badge variant="outline" className="ml-1 rounded-sm text-[9px]">
+                  <Badge
+                    variant="outline"
+                    className="ml-1 rounded-sm text-[9px]"
+                  >
                     FUTURE PLACEHOLDER
                   </Badge>
                 </p>
                 <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-                  Voice recording and speech transcription are not available in this prototype.
+                  Voice recording and speech transcription are not available in
+                  this prototype.
                 </p>
               </div>
             </div>
@@ -1104,9 +1109,9 @@ function AssessmentPage({
               onChange={(event) => setConsent(event.target.checked)}
             />
             <span className="text-[11px] leading-5 text-muted-foreground">
-              I understand that this is a fictional interface demonstration. No real complaint is
-              submitted or stored, and the displayed indicators do not establish a diagnosis or
-              determine safety.
+              I understand that this is a fictional interface demonstration. No
+              real complaint is submitted or stored, and the displayed
+              indicators do not establish a diagnosis or determine safety.
             </span>
           </label>
           {error && (
@@ -1117,7 +1122,11 @@ function AssessmentPage({
               {error}
             </p>
           )}
-          <Button type="submit" disabled={loading} className="w-full gap-2 sm:w-auto">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full gap-2 sm:w-auto"
+          >
             {loading ? (
               <>
                 <span className="size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />{" "}
@@ -1132,7 +1141,10 @@ function AssessmentPage({
         </form>
         <div className="space-y-5">
           <section className="rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden">
-            <SectionHeading title="Prepared scenarios" caption="Load a fictional narrative" />
+            <SectionHeading
+              title="Prepared scenarios"
+              caption="Load a fictional narrative"
+            />
             <div className="divide-y divide-[#DCE7E2]">
               {preparedScenarios.map((scenario, index) => (
                 <button
@@ -1145,7 +1157,9 @@ function AssessmentPage({
                     0{index + 1}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-semibold text-[#123052]">{scenario.title}</span>
+                    <span className="block text-xs font-semibold text-[#123052]">
+                      {scenario.title}
+                    </span>
                     <span className="mt-0.5 block truncate text-[11px] text-[#5A6E82]">
                       {scenario.narrative}
                     </span>
@@ -1159,29 +1173,32 @@ function AssessmentPage({
             <SectionHeading title="Transparent demonstration rules" />
             <div className="space-y-3 p-4">
               <p className="text-[11px] leading-5 text-muted-foreground">
-                Simple phrase matching highlights only the following observable text. It does not
-                infer intent, severity, or whether a person is safe.
+                Simple phrase matching highlights only the following observable
+                text. It does not infer intent, severity, or whether a person is
+                safe.
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {(["fear", "duration", "safety", "overwhelm"] as const).map((key) => (
-                  <div
-                    key={key}
-                    className="flex items-center gap-2 border border-[#DCE7E2] rounded-lg px-2.5 py-2 text-[10px]"
-                  >
-                    <span className="size-1.5 rounded-full bg-primary" />
-                    {key === "fear"
-                      ? "Expressed fear"
-                      : key === "duration"
-                        ? "Prolonged distress"
-                        : key === "safety"
-                          ? "Stated safety concern"
-                          : "Emotional overwhelm"}
-                  </div>
-                ))}
+                {(["fear", "duration", "safety", "overwhelm"] as const).map(
+                  (key) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-2 border border-[#DCE7E2] rounded-lg px-2.5 py-2 text-[10px]"
+                    >
+                      <span className="size-1.5 rounded-full bg-primary" />
+                      {key === "fear"
+                        ? "Expressed fear"
+                        : key === "duration"
+                          ? "Prolonged distress"
+                          : key === "safety"
+                            ? "Stated safety concern"
+                            : "Emotional overwhelm"}
+                    </div>
+                  ),
+                )}
               </div>
               <div className="border-l-2 border-status-moderate pl-3 text-[10px] leading-4 text-muted-foreground">
-                No indicator found does not mean that a person is safe. Human review is always
-                required.
+                No indicator found does not mean that a person is safe. Human
+                review is always required.
               </div>
             </div>
           </section>
@@ -1210,7 +1227,8 @@ function AssessmentResult({
   onOpen: () => void;
   onNotify: (message: string) => void;
 }) {
-  const displayEvidence: { label: string; evidence: string }[] = result.indicators.length
+  const displayEvidence: { label: string; evidence: string }[] = result
+    .indicators.length
     ? result.indicators
     : [
         {
@@ -1219,7 +1237,10 @@ function AssessmentResult({
         },
       ];
   return (
-    <section className="mt-6 rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden" aria-live="polite">
+    <section
+      className="mt-6 rounded-2xl border border-[#DCE7E2] bg-white shadow-xs overflow-hidden"
+      aria-live="polite"
+    >
       <SectionHeading
         title="Illustrative assessment result"
         caption="Generated from transparent demonstration rules only"
@@ -1238,7 +1259,9 @@ function AssessmentResult({
             ILLUSTRATIVE SVI
           </p>
           <div className="mt-3 flex items-end gap-2">
-            <span className="text-5xl font-semibold tabular-nums leading-none">{result.score}</span>
+            <span className="text-5xl font-semibold tabular-nums leading-none">
+              {result.score}
+            </span>
             <span className="pb-1 text-sm text-muted-foreground">/ 100</span>
           </div>
           <p className="mt-3 text-[10px] leading-4 text-muted-foreground">
@@ -1257,10 +1280,15 @@ function AssessmentResult({
         <div className="p-5">
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <h4 className="text-xs font-semibold">Observed text indicators</h4>
+              <h4 className="text-xs font-semibold">
+                Observed text indicators
+              </h4>
               <div className="mt-3 space-y-3">
                 {displayEvidence.map((item, index) => (
-                  <div key={`${item.label}-${index}`} className="border-l-2 border-primary/40 pl-3">
+                  <div
+                    key={`${item.label}-${index}`}
+                    className="border-l-2 border-primary/40 pl-3"
+                  >
                     <p className="text-xs font-medium">{item.label}</p>
                     <p className="mt-1 break-words text-[11px] leading-5 text-muted-foreground">
                       {item.evidence}
@@ -1276,47 +1304,49 @@ function AssessmentResult({
               </blockquote>
               <div className="mt-3 flex items-start gap-2 text-[10px] leading-4 text-muted-foreground">
                 <ShieldCheck className="mt-0.5 size-4 shrink-0 text-status-moderate" />
-                Preliminary phrase-match indicators only. Not a diagnosis, risk determination, or
-                substitute for a trained responder.
+                Preliminary phrase-match indicators only. Not a diagnosis, risk
+                determination, or substitute for a trained responder.
               </div>
             </div>
           </div>
 
-          {result.suggestedQuestions && result.suggestedQuestions.length > 0 && (
-            <div className="mt-5 border-t border-border pt-4">
-              <h4 className="flex items-center gap-2 text-xs font-bold text-primary">
-                <HeartHandshake className="size-4 text-teal-600" />
-                Suggested Responder Follow-up Questions
-              </h4>
-              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                {result.suggestedQuestions.map((q, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/20 p-3 text-xs leading-relaxed"
-                  >
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                      {idx + 1}
-                    </span>
-                    <span className="text-foreground">{q}</span>
-                  </div>
-                ))}
+          {result.suggestedQuestions &&
+            result.suggestedQuestions.length > 0 && (
+              <div className="mt-5 border-t border-border pt-4">
+                <h4 className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <HeartHandshake className="size-4 text-teal-600" />
+                  Suggested Responder Follow-up Questions
+                </h4>
+                <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                  {result.suggestedQuestions.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/20 p-3 text-xs leading-relaxed"
+                    >
+                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                        {idx + 1}
+                      </span>
+                      <span className="text-foreground">{q}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {result.missingInformation && result.missingInformation.length > 0 && (
-            <div className="mt-4 rounded-xl border border-[#DCE7E2] bg-[#FCFBF8] p-3.5 text-xs text-[#5A6E82]">
-              <p className="font-bold text-[#123052] text-[11px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                <Info className="size-3.5 text-[#328B86]" />
-                Assessment Context & Limitations
-              </p>
-              <ul className="list-disc pl-4 space-y-1 text-[11px]">
-                {result.missingInformation.map((info, idx) => (
-                  <li key={idx}>{info}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {result.missingInformation &&
+            result.missingInformation.length > 0 && (
+              <div className="mt-4 rounded-xl border border-[#DCE7E2] bg-[#FCFBF8] p-3.5 text-xs text-[#5A6E82]">
+                <p className="font-bold text-[#123052] text-[11px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <Info className="size-3.5 text-[#328B86]" />
+                  Assessment Context & Limitations
+                </p>
+                <ul className="list-disc pl-4 space-y-1 text-[11px]">
+                  {result.missingInformation.map((info, idx) => (
+                    <li key={idx}>{info}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button size="sm" onClick={onOpen}>
@@ -1336,7 +1366,11 @@ function AssessmentResult({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onNotify("Follow-up noted for responder review; no message was sent.")}
+              onClick={() =>
+                onNotify(
+                  "Follow-up noted for responder review; no message was sent.",
+                )
+              }
             >
               Request follow-up
             </Button>
@@ -1358,7 +1392,13 @@ function AssessmentResult({
   );
 }
 
-function CasesPage({ cases, onOpenCase }: { cases: DemoCase[]; onOpenCase: (id: string) => void }) {
+function CasesPage({
+  cases,
+  onOpenCase,
+}: {
+  cases: DemoCase[];
+  onOpenCase: (id: string) => void;
+}) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [language, setLanguage] = useState("all");
@@ -1378,7 +1418,9 @@ function CasesPage({ cases, onOpenCase }: { cases: DemoCase[]; onOpenCase: (id: 
             (language === "all" || item.language === language)
           );
         })
-        .sort((a, b) => (sortNewest ? b.id.localeCompare(a.id) : a.id.localeCompare(b.id))),
+        .sort((a, b) =>
+          sortNewest ? b.id.localeCompare(a.id) : a.id.localeCompare(b.id),
+        ),
     [cases, search, status, language, sortNewest],
   );
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -1390,14 +1432,19 @@ function CasesPage({ cases, onOpenCase }: { cases: DemoCase[]; onOpenCase: (id: 
         title="Case management"
         description="Search and review fictional cases. Select a record to inspect the narrative, history, and responder notes."
         action={
-          <Button variant="outline" className="gap-2" onClick={() => window.print()}>
-            <FileChartColumnIncreasing /> <span className="hidden sm:inline">Print list</span>
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => window.print()}
+          >
+            <FileChartColumnIncreasing />{" "}
+            <span className="hidden sm:inline">Print list</span>
           </Button>
         }
       />
       <DemoNotice>
-        All records below are synthetic demonstration cases. Avoid entering personal information; no
-        real case records are held in this prototype.
+        All records below are synthetic demonstration cases. Avoid entering
+        personal information; no real case records are held in this prototype.
       </DemoNotice>
       <section className="mt-5 border border-border bg-card">
         <div className="grid gap-3 border-b border-border p-4 sm:grid-cols-[minmax(200px,1fr)_170px_150px_auto] sm:items-center">
@@ -1430,7 +1477,9 @@ function CasesPage({ cases, onOpenCase }: { cases: DemoCase[]; onOpenCase: (id: 
               <SelectItem value="Pending review">Pending review</SelectItem>
               <SelectItem value="In review">In review</SelectItem>
               <SelectItem value="Reviewed">Reviewed</SelectItem>
-              <SelectItem value="Follow-up requested">Follow-up requested</SelectItem>
+              <SelectItem value="Follow-up requested">
+                Follow-up requested
+              </SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -1465,7 +1514,8 @@ function CasesPage({ cases, onOpenCase }: { cases: DemoCase[]; onOpenCase: (id: 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
           <p className="text-[11px] text-muted-foreground">
             Showing {filtered.length ? (page - 1) * pageSize + 1 : 0}–
-            {Math.min(page * pageSize, filtered.length)} of {filtered.length} fictional cases
+            {Math.min(page * pageSize, filtered.length)} of {filtered.length}{" "}
+            fictional cases
           </p>
           <div className="flex items-center gap-1">
             <Button
@@ -1533,8 +1583,9 @@ function CaseDetailPage({
         action={<StatusBadge status={item.status} />}
       />
       <DemoNotice>
-        <strong>Synthetic case record.</strong> The illustrative score and matched text are not a
-        clinical assessment. Human review is required; no indicator means a person is safe.
+        <strong>Synthetic case record.</strong> The illustrative score and
+        matched text are not a clinical assessment. Human review is required; no
+        indicator means a person is safe.
       </DemoNotice>
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)]">
         <div className="space-y-4">
@@ -1549,7 +1600,9 @@ function CaseDetailPage({
                 <p className="text-[10px] font-semibold tracking-[0.1em] text-muted-foreground">
                   FICTIONAL NARRATIVE
                 </p>
-                <p className="mt-2 text-xs leading-6 text-muted-foreground">“{item.narrative}”</p>
+                <p className="mt-2 text-xs leading-6 text-muted-foreground">
+                  “{item.narrative}”
+                </p>
               </div>
             </div>
           </section>
@@ -1566,19 +1619,24 @@ function CaseDetailPage({
                     className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-5"
                   >
                     <p className="text-xs font-medium">{indicator.label}</p>
-                    <p className="text-xs leading-5 text-muted-foreground">{indicator.evidence}</p>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      {indicator.evidence}
+                    </p>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="px-5 py-5 text-xs leading-5 text-muted-foreground">
-                No configured phrase was matched. This does not mean the person is safe or does not
-                need support.
+                No configured phrase was matched. This does not mean the person
+                is safe or does not need support.
               </p>
             )}
           </section>
           <section className="border border-border bg-card">
-            <SectionHeading title="Responder notes" caption="Editable local demonstration notes" />
+            <SectionHeading
+              title="Responder notes"
+              caption="Editable local demonstration notes"
+            />
             <div className="space-y-3 p-5">
               <Textarea
                 aria-label="Responder notes"
@@ -1589,7 +1647,9 @@ function CaseDetailPage({
               />
               <Button
                 size="sm"
-                onClick={() => onUpdate(item.id, { notes }, "Responder notes updated")}
+                onClick={() =>
+                  onUpdate(item.id, { notes }, "Responder notes updated")
+                }
               >
                 Save notes
               </Button>
@@ -1626,7 +1686,11 @@ function CaseDetailPage({
                   variant="outline"
                   className="gap-2"
                   onClick={() => {
-                    onUpdate(item.id, { status: "Reviewed" }, "Marked reviewed by responder");
+                    onUpdate(
+                      item.id,
+                      { status: "Reviewed" },
+                      "Marked reviewed by responder",
+                    );
                     onNotify("Marked reviewed in the demonstration case.");
                   }}
                 >
@@ -1642,7 +1706,9 @@ function CaseDetailPage({
                       { status: "Follow-up requested" },
                       "Follow-up requested by responder",
                     );
-                    onNotify("Follow-up noted for responder review. No message was sent.");
+                    onNotify(
+                      "Follow-up noted for responder review. No message was sent.",
+                    );
                   }}
                 >
                   <MessageSquareText /> Follow-up
@@ -1662,18 +1728,28 @@ function CaseDetailPage({
             <SectionHeading title="Assessment snapshot" />
             <div className="p-4">
               <div className="flex items-end justify-between">
-                <span className="text-xs text-muted-foreground">Illustrative SVI</span>
+                <span className="text-xs text-muted-foreground">
+                  Illustrative SVI
+                </span>
                 <span className="text-2xl font-semibold tabular-nums">
                   {item.score}
-                  <span className="text-xs font-normal text-muted-foreground"> / 100</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {" "}
+                    / 100
+                  </span>
                 </span>
               </div>
               <div className="mt-3 h-1.5 bg-muted">
-                <div className="h-full bg-primary" style={{ width: `${item.score}%` }} />
+                <div
+                  className="h-full bg-primary"
+                  style={{ width: `${item.score}%` }}
+                />
               </div>
               <div className="mt-3 flex items-center justify-between">
                 <PriorityBadge priority={item.priority} />
-                <span className="text-[10px] text-muted-foreground">Not clinically validated</span>
+                <span className="text-[10px] text-muted-foreground">
+                  Not clinically validated
+                </span>
               </div>
               <div className="mt-4 border-t border-border pt-3">
                 <p className="flex items-center gap-2 text-[10px] text-status-high">
@@ -1774,7 +1850,10 @@ function ReferralsPage({
         title="Referral center"
         description="Review available categories and record mock referrals for responder follow-up. Nothing is sent to an external service."
         action={
-          <Button onClick={() => setShowForm((value) => !value)} className="gap-2">
+          <Button
+            onClick={() => setShowForm((value) => !value)}
+            className="gap-2"
+          >
             <Plus />
             <span className="hidden sm:inline">Create mock referral</span>
             <span className="sm:hidden">Create</span>
@@ -1782,11 +1861,15 @@ function ReferralsPage({
         }
       />
       <DemoNotice>
-        <strong>Human action only.</strong> Referrals in this prototype are local records. Police
-        intervention, emergency support, and every other service are never initiated automatically.
+        <strong>Human action only.</strong> Referrals in this prototype are
+        local records. Police intervention, emergency support, and every other
+        service are never initiated automatically.
       </DemoNotice>
       {showForm && (
-        <form onSubmit={create} className="mt-5 border border-primary/30 bg-card p-4 sm:p-5">
+        <form
+          onSubmit={create}
+          className="mt-5 border border-primary/30 bg-card p-4 sm:p-5"
+        >
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold">Create a mock referral</h3>
@@ -1823,7 +1906,9 @@ function ReferralsPage({
               Referral category
               <select
                 value={category}
-                onChange={(event) => setCategory(event.target.value as ReferralCategory)}
+                onChange={(event) =>
+                  setCategory(event.target.value as ReferralCategory)
+                }
                 className="mt-2 h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
               >
                 {referralCategories.map((item) => (
@@ -1870,7 +1955,9 @@ function ReferralsPage({
                   <td className="px-5 py-4 font-semibold">{item.id}</td>
                   <td className="px-4 py-4 text-primary">{item.caseId}</td>
                   <td className="px-4 py-4">{item.category}</td>
-                  <td className="px-4 py-4 text-muted-foreground">{item.date}</td>
+                  <td className="px-4 py-4 text-muted-foreground">
+                    {item.date}
+                  </td>
                   <td className="px-4 py-4">
                     <StatusBadge status={item.status} />
                   </td>
@@ -1879,7 +1966,10 @@ function ReferralsPage({
                       aria-label={`Update status for ${item.id}`}
                       value={item.status}
                       onChange={(event) =>
-                        onUpdate(item.id, event.target.value as DemoReferral["status"])
+                        onUpdate(
+                          item.id,
+                          event.target.value as DemoReferral["status"],
+                        )
                       }
                       className="h-8 rounded border border-input bg-background px-2 text-[11px]"
                     >
@@ -1913,7 +2003,8 @@ function ReferralsPage({
               <div>
                 <p className="text-xs font-semibold">{item}</p>
                 <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
-                  Review availability with the person and confirm choices directly.
+                  Review availability with the person and confirm choices
+                  directly.
                 </p>
               </div>
             </div>
@@ -1933,10 +2024,22 @@ const referralCategoryIcons: Record<ReferralCategory, typeof HeartHandshake> = {
   "Emergency support": LifeBuoy,
 };
 
-function ReportsPage({ cases, referrals }: { cases: DemoCase[]; referrals: DemoReferral[] }) {
-  const statusData = ["Pending review", "In review", "Reviewed", "Follow-up requested"].map(
-    (name) => ({ name, count: cases.filter((item) => item.status === name).length }),
-  );
+function ReportsPage({
+  cases,
+  referrals,
+}: {
+  cases: DemoCase[];
+  referrals: DemoReferral[];
+}) {
+  const statusData = [
+    "Pending review",
+    "In review",
+    "Reviewed",
+    "Follow-up requested",
+  ].map((name) => ({
+    name,
+    count: cases.filter((item) => item.status === name).length,
+  }));
   const languageData = ["English", "Hindi", "Other"].map((name) => ({
     name,
     count: cases.filter((item) => item.language === name).length,
@@ -1969,8 +2072,9 @@ function ReportsPage({ cases, referrals }: { cases: DemoCase[]; referrals: DemoR
         }
       />
       <DemoNotice>
-        <strong>Illustrative metrics only.</strong> These mock figures are not validated model
-        performance, official statistics, or evidence of clinical effectiveness.
+        <strong>Illustrative metrics only.</strong> These mock figures are not
+        validated model performance, official statistics, or evidence of
+        clinical effectiveness.
       </DemoNotice>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {[
@@ -2003,7 +2107,10 @@ function ReportsPage({ cases, referrals }: { cases: DemoCase[]; referrals: DemoR
             <SectionHeading title={chart.title} caption={chart.caption} />
             <div className="h-[240px] p-4 pt-5">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chart.data} margin={{ top: 5, right: 8, left: -20, bottom: 0 }}>
+                <AreaChart
+                  data={chart.data}
+                  margin={{ top: 5, right: 8, left: -20, bottom: 0 }}
+                >
                   <CartesianGrid
                     vertical={false}
                     stroke="var(--color-border)"
@@ -2013,13 +2120,19 @@ function ReportsPage({ cases, referrals }: { cases: DemoCase[]; referrals: DemoR
                     dataKey="month"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
+                    tick={{
+                      fill: "var(--color-muted-foreground)",
+                      fontSize: 11,
+                    }}
                   />
                   <YAxis
                     allowDecimals={false}
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
+                    tick={{
+                      fill: "var(--color-muted-foreground)",
+                      fontSize: 11,
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
@@ -2057,9 +2170,18 @@ function SettingsPage({
   setSettings: (value: ScoreSettings) => void;
 }) {
   const updateWeight = (key: keyof ScoreSettings["weights"], value: number) =>
-    setSettings({ ...settings, weights: { ...settings.weights, [key]: value } });
-  const updateThreshold = (key: keyof ScoreSettings["thresholds"], value: number) =>
-    setSettings({ ...settings, thresholds: { ...settings.thresholds, [key]: value } });
+    setSettings({
+      ...settings,
+      weights: { ...settings.weights, [key]: value },
+    });
+  const updateThreshold = (
+    key: keyof ScoreSettings["thresholds"],
+    value: number,
+  ) =>
+    setSettings({
+      ...settings,
+      thresholds: { ...settings.thresholds, [key]: value },
+    });
   return (
     <>
       <PageIntro
@@ -2068,8 +2190,9 @@ function SettingsPage({
         description="Configure language preference and transparent demonstration scoring rules for this browser session."
       />
       <DemoNotice>
-        These controls are for interface prototyping only. Thresholds and weights are not clinically
-        validated, and the settings are not production security configuration.
+        These controls are for interface prototyping only. Thresholds and
+        weights are not clinically validated, and the settings are not
+        production security configuration.
       </DemoNotice>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <section className="border border-border bg-card">
@@ -2091,47 +2214,54 @@ function SettingsPage({
             <div className="flex items-start gap-3 border-t border-border pt-4">
               <Languages className="mt-0.5 size-4 text-muted-foreground" />
               <p className="text-[11px] leading-5 text-muted-foreground">
-                Language preference is illustrative. This demonstration interface currently displays
-                in English.
+                Language preference is illustrative. This demonstration
+                interface currently displays in English.
               </p>
             </div>
           </div>
         </section>
         <section className="border border-border bg-card">
-          <SectionHeading title="Demonstration weights" caption="Maximum illustrative score: 100" />
+          <SectionHeading
+            title="Demonstration weights"
+            caption="Maximum illustrative score: 100"
+          />
           <div className="space-y-5 p-5">
-            {(["fear", "duration", "safety", "overwhelm"] as const).map((key) => (
-              <label
-                key={key}
-                className="grid grid-cols-[minmax(0,1fr)_54px] items-center gap-x-4 gap-y-2 text-xs font-medium"
-              >
-                <span>
-                  {key === "fear"
-                    ? "Expressed fear"
-                    : key === "duration"
-                      ? "Prolonged distress"
-                      : key === "safety"
-                        ? "Stated safety concern"
-                        : "Emotional overwhelm"}
-                </span>
-                <span className="text-right tabular-nums text-muted-foreground">
-                  {settings.weights[key]}
-                </span>
-                <input
-                  aria-label={`${key} weight`}
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="5"
-                  value={settings.weights[key]}
-                  onChange={(event) => updateWeight(key, Number(event.target.value))}
-                  className="col-span-2 h-1.5 w-full cursor-pointer accent-primary"
-                />
-              </label>
-            ))}
+            {(["fear", "duration", "safety", "overwhelm"] as const).map(
+              (key) => (
+                <label
+                  key={key}
+                  className="grid grid-cols-[minmax(0,1fr)_54px] items-center gap-x-4 gap-y-2 text-xs font-medium"
+                >
+                  <span>
+                    {key === "fear"
+                      ? "Expressed fear"
+                      : key === "duration"
+                        ? "Prolonged distress"
+                        : key === "safety"
+                          ? "Stated safety concern"
+                          : "Emotional overwhelm"}
+                  </span>
+                  <span className="text-right tabular-nums text-muted-foreground">
+                    {settings.weights[key]}
+                  </span>
+                  <input
+                    aria-label={`${key} weight`}
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={settings.weights[key]}
+                    onChange={(event) =>
+                      updateWeight(key, Number(event.target.value))
+                    }
+                    className="col-span-2 h-1.5 w-full cursor-pointer accent-primary"
+                  />
+                </label>
+              ),
+            )}
             <p className="border-t border-border pt-3 text-[10px] leading-4 text-muted-foreground">
-              Scores are simple rule-based sums capped at 100. Weights do not represent risk,
-              clinical significance, or likelihood.
+              Scores are simple rule-based sums capped at 100. Weights do not
+              represent risk, clinical significance, or likelihood.
             </p>
           </div>
         </section>
@@ -2144,8 +2274,14 @@ function SettingsPage({
             {(["moderate", "high", "urgent"] as const).map((key) => (
               <label key={key} className="block text-xs font-medium">
                 <span className="flex items-center justify-between gap-2">
-                  {key === "moderate" ? "Moderate" : key === "high" ? "High" : "Urgent review"}
-                  <span className="font-semibold tabular-nums">{settings.thresholds[key]}</span>
+                  {key === "moderate"
+                    ? "Moderate"
+                    : key === "high"
+                      ? "High"
+                      : "Urgent review"}
+                  <span className="font-semibold tabular-nums">
+                    {settings.thresholds[key]}
+                  </span>
                 </span>
                 <input
                   aria-label={`${key} threshold`}
@@ -2154,7 +2290,9 @@ function SettingsPage({
                   max="100"
                   step="5"
                   value={settings.thresholds[key]}
-                  onChange={(event) => updateThreshold(key, Number(event.target.value))}
+                  onChange={(event) =>
+                    updateThreshold(key, Number(event.target.value))
+                  }
                   className="mt-4 h-1.5 w-full cursor-pointer accent-primary"
                 />
               </label>
@@ -2167,10 +2305,12 @@ function SettingsPage({
             <div>
               <h3 className="text-xs font-semibold">Prototype disclaimer</h3>
               <p className="mt-1.5 text-[11px] leading-5 text-muted-foreground">
-                SAHYOG AI is a frontend demonstration. Phrase matching and scores are fictional,
-                preliminary indicators—not a clinical diagnosis or validated screening tool. Human
-                review is required for every case. No personal data, actual user management,
-                external AI, production security, or real helpline services are configured.
+                SAHYOG AI is a frontend demonstration. Phrase matching and
+                scores are fictional, preliminary indicators—not a clinical
+                diagnosis or validated screening tool. Human review is required
+                for every case. No personal data, actual user management,
+                external AI, production security, or real helpline services are
+                configured.
               </p>
             </div>
           </div>

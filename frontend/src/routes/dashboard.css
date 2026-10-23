@@ -1,0 +1,744 @@
+
+/* SAHYOG AI — Dashboard visual system */
+
+.sahyog-app {
+  --sahyog-navy: #153451;
+  --sahyog-navy-deep: #102941;
+  --sahyog-teal: #318c85;
+  --sahyog-teal-soft: #e8f4f0;
+  --sahyog-paper: #f6f8f7;
+  --sahyog-white: #ffffff;
+  --sahyog-border: #e1e9e6;
+  --sahyog-muted: #718096;
+  --sahyog-text: #20364b;
+  min-height: 100vh;
+  background: var(--sahyog-paper);
+  color: var(--sahyog-text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sahyog-app *,
+.sahyog-app *::before,
+.sahyog-app *::after {
+  box-sizing: border-box;
+}
+
+.sahyog-app button,
+.sahyog-app input,
+.sahyog-app textarea,
+.sahyog-app select {
+  font: inherit;
+}
+
+.sahyog-sidebar {
+  z-index: 40;
+  overflow-y: auto;
+  background: var(--sahyog-navy-deep);
+  color: #f4f8fb;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 24px rgba(16, 41, 65, 0.05);
+}
+
+.sahyog-sidebar button {
+  border: 1px solid transparent;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.sahyog-sidebar button:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.sahyog-sidebar .sahyog-nav-active {
+  background: #e7f4ef;
+  color: #153d51;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 3px 0 0 #4ab4a4;
+}
+
+.sahyog-sidebar .sahyog-nav-active:hover {
+  background: #dcefe8;
+  color: #153d51;
+}
+
+.sahyog-app main {
+  min-width: 0;
+  background: var(--sahyog-paper);
+}
+
+.sahyog-app main > header {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: var(--sahyog-border);
+  box-shadow: 0 2px 10px rgba(25, 55, 75, 0.025);
+}
+
+.sahyog-app main > header h1 {
+  color: var(--sahyog-navy);
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+
+.sahyog-app main > header a,
+.sahyog-app main > header button {
+  transition: all 160ms ease;
+}
+
+.sahyog-app main > header a:hover {
+  border-color: #9ccfc3;
+}
+
+.sahyog-app main > div:not(.sahyog-sidebar) {
+  min-width: 0;
+}
+
+.sahyog-app main h2,
+.sahyog-app main h3,
+.sahyog-app main h4 {
+  color: var(--sahyog-navy);
+  letter-spacing: -0.025em;
+}
+
+.sahyog-app main h2 {
+  font-weight: 750;
+}
+
+.sahyog-app main p {
+  overflow-wrap: anywhere;
+}
+
+.sahyog-app main section {
+  min-width: 0;
+}
+
+.sahyog-app main table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.sahyog-app main th {
+  background: #f7faf9;
+  color: #65798b;
+  font-size: 10px;
+  letter-spacing: 0.075em;
+}
+
+.sahyog-app main td,
+.sahyog-app main th {
+  border-color: var(--sahyog-border);
+}
+
+.sahyog-app main tbody tr {
+  transition: background 150ms ease;
+}
+
+.sahyog-app main tbody tr:hover {
+  background: #f0f7f4;
+}
+
+.sahyog-app main footer {
+  color: var(--sahyog-muted);
+  border-color: var(--sahyog-border);
+}
+
+.sahyog-app :focus-visible {
+  outline: 3px solid rgba(49, 140, 133, 0.55);
+  outline-offset: 3px;
+}
+
+.sahyog-app ::selection {
+  background: #cce8df;
+  color: var(--sahyog-navy-deep);
+}
+
+@media (max-width: 1023px) {
+  .sahyog-sidebar {
+    box-shadow: 12px 0 36px rgba(16, 41, 65, 0.18);
+  }
+}
+
+@media (max-width: 640px) {
+  .sahyog-app {
+    font-size: 13px;
+  }
+
+  .sahyog-app main > div {
+    max-width: 100%;
+  }
+
+  .sahyog-app main > header {
+    position: sticky;
+  }
+
+  .sahyog-app main table {
+    font-size: 11px;
+  }
+
+  .sahyog-app main footer {
+    line-height: 1.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sahyog-app *,
+  .sahyog-app *::before,
+  .sahyog-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+/* Refined dashboard surfaces */
+.sahyog-app main section {
+  border-radius: 12px;
+  border-color: #e0e9e5;
+  box-shadow: 0 2px 8px rgba(21, 52, 81, 0.025);
+  overflow: hidden;
+}
+
+.sahyog-app main section > div {
+  min-width: 0;
+}
+
+.sahyog-app main section h3,
+.sahyog-app main section h4 {
+  font-weight: 700;
+}
+
+.sahyog-app main section button {
+  border-radius: 8px;
+}
+
+.sahyog-app main section button:hover {
+  transform: translateY(-1px);
+}
+
+.sahyog-app main section button:active {
+  transform: translateY(0);
+}
+
+.sahyog-app main table thead th {
+  padding-top: 13px;
+  padding-bottom: 13px;
+  background: #f2f7f5;
+}
+
+.sahyog-app main table tbody td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.sahyog-app main table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sahyog-app .sahyog-sidebar {
+  box-shadow: 4px 0 20px rgba(16, 41, 65, 0.06);
+}
+
+.sahyog-app .sahyog-sidebar button {
+  border-radius: 9px;
+}
+
+.sahyog-app main > header {
+  box-shadow: 0 1px 5px rgba(21, 52, 81, 0.035);
+}
+
+@media (max-width: 640px) {
+  .sahyog-app main section {
+    border-radius: 10px;
+  }
+
+  .sahyog-app main table tbody td {
+    padding: 10px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sahyog-app main section button:hover {
+    transform: none;
+  }
+}
+
+
+
+/* New Assessment — refined visual design */
+.sahyog-app .assessment-page {
+  --assessment-border: #dce8e3;
+  --assessment-teal: #318c85;
+  --assessment-ink: #153451;
+}
+
+.sahyog-app .assessment-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--assessment-border);
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(21, 52, 81, 0.045);
+}
+
+.sahyog-app .assessment-page input:not([type="checkbox"]),
+.sahyog-app .assessment-page textarea,
+.sahyog-app .assessment-page select {
+  border-radius: 10px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.sahyog-app .assessment-page textarea {
+  min-height: 190px;
+  padding: 15px 16px;
+  line-height: 1.75;
+  resize: vertical;
+}
+
+.sahyog-app .assessment-page textarea:focus,
+.sahyog-app .assessment-page input:focus,
+.sahyog-app .assessment-page select:focus {
+  border-color: var(--assessment-teal);
+  box-shadow: 0 0 0 3px rgba(49, 140, 133, 0.12);
+  outline: none;
+}
+
+.sahyog-app .assessment-page form label {
+  color: #29465d;
+  font-weight: 600;
+}
+
+.sahyog-app .assessment-page section {
+  border: 1px solid var(--assessment-border);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(21, 52, 81, 0.035);
+  overflow: hidden;
+}
+
+.sahyog-app .assessment-page section > button {
+  min-height: 76px;
+  padding: 16px 18px;
+  text-align: left;
+  transition: background 160ms ease;
+}
+
+.sahyog-app .assessment-page section > button:hover {
+  background: #f0f8f5;
+}
+
+.sahyog-app .assessment-page section > button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid rgba(49, 140, 133, 0.45);
+  outline-offset: -3px;
+}
+
+.sahyog-app .assessment-page form button[type="submit"] {
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-weight: 650;
+  box-shadow: 0 3px 8px rgba(21, 52, 81, 0.1);
+}
+
+.sahyog-app .assessment-page form button[type="submit"]:hover {
+  filter: brightness(1.06);
+}
+
+.sahyog-app .assessment-page form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.sahyog-app .assessment-page form [role="alert"] {
+  padding: 12px 14px;
+  border-radius: 10px;
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .sahyog-app .assessment-page form {
+    gap: 17px;
+    padding: 17px;
+    border-radius: 14px;
+  }
+
+  .sahyog-app .assessment-page textarea {
+    min-height: 160px;
+  }
+
+  .sahyog-app .assessment-page section > button {
+    min-height: 70px;
+    padding: 13px;
+  }
+
+  .sahyog-app .assessment-page form button[type="submit"] {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sahyog-app .assessment-page * {
+    transition: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   SAHYOG AI — Calm, Colourful, Trustworthy Dashboard
+   Append to the bottom of dashboard.css
+   ========================================================= */
+
+.sahyog-app {
+  --sahyog-navy: #153451;
+  --sahyog-navy-deep: #102941;
+  --sahyog-teal: #318c85;
+  --sahyog-mint: #e5f4ed;
+  --sahyog-lavender: #f0ebfb;
+  --sahyog-peach: #fff0e7;
+  --sahyog-sky: #eaf3fb;
+  --sahyog-paper: #f5f8f7;
+  --sahyog-border: #dfe9e5;
+  --sahyog-muted: #61758a;
+  color: #20364b;
+  background: var(--sahyog-paper);
+  font-family: "DM Sans", Inter, system-ui, sans-serif;
+  line-height: 1.55;
+}
+
+.sahyog-app main {
+  min-width: 0;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(225, 239, 250, 0.35), transparent 35%),
+    #f5f8f7;
+}
+
+.sahyog-app main > header {
+  border-color: #dfe9e5;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 3px 16px rgba(21, 52, 81, 0.045);
+}
+
+.sahyog-app main h1,
+.sahyog-app main h2,
+.sahyog-app main h3 {
+  color: #173a56;
+  letter-spacing: -0.025em;
+}
+
+.sahyog-app main h2 {
+  font-weight: 750;
+}
+
+.sahyog-app main p {
+  overflow-wrap: anywhere;
+}
+
+/* Sidebar */
+
+.sahyog-sidebar {
+  background: linear-gradient(165deg, #153651 0%, #102941 72%, #163c50 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 5px 0 24px rgba(16, 41, 65, 0.07);
+}
+
+.sahyog-sidebar button {
+  border: 1px solid transparent;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.sahyog-sidebar button:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.sahyog-sidebar .sahyog-nav-active {
+  background: linear-gradient(100deg, #e4f5ed, #eff8f5);
+  color: #153d51;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: inset 3px 0 0 #49b6a5, 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sahyog-sidebar .sahyog-nav-active:hover {
+  background: #d9efe6;
+  color: #153d51;
+}
+
+.sahyog-sidebar button:focus-visible {
+  outline: 3px solid #8ee0d1;
+  outline-offset: 2px;
+}
+
+/* Page headings and introductory sections */
+
+.sahyog-app main h2 {
+  line-height: 1.2;
+}
+
+.sahyog-app main h2 + p,
+.sahyog-app main h3 + p {
+  color: #61758a;
+}
+
+.sahyog-app main [class*="text-primary"] {
+  color: #247f79;
+}
+
+.sahyog-app main [class*="tracking-"] {
+  letter-spacing: 0.055em;
+}
+
+/* Cards, panels and sections */
+
+.sahyog-app main section,
+.sahyog-app main [class*="border-border"][class*="bg-card"] {
+  border-color: #dfe9e5;
+}
+
+.sahyog-app main section {
+  border-radius: 16px;
+  box-shadow: 0 5px 22px rgba(21, 52, 81, 0.035);
+  overflow: hidden;
+}
+
+.sahyog-app main section > div {
+  min-width: 0;
+}
+
+.sahyog-app main [class*="bg-card"] {
+  background-color: #ffffff;
+}
+
+.sahyog-app main [class*="rounded-sm"] {
+  border-radius: 7px;
+}
+
+.sahyog-app main [class*="rounded-md"] {
+  border-radius: 10px;
+}
+
+.sahyog-app main [class*="rounded-lg"] {
+  border-radius: 11px;
+}
+
+/* Metric cards */
+
+.sahyog-app main [class*="tabular-nums"] {
+  color: #173a56;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+
+.sahyog-app main [class*="bg-brand-soft"] {
+  background: #e4f3ed;
+  color: #237b73;
+}
+
+.sahyog-app main [class*="bg-status-moderate\\/10"] {
+  background: #fff2d9;
+  color: #96651b;
+}
+
+.sahyog-app main [class*="bg-status-urgent\\/10"],
+.sahyog-app main [class*="bg-status-high\\/10"] {
+  background: #fde9e9;
+  color: #b54e59;
+}
+
+.sahyog-app main [class*="bg-status-low\\/10"] {
+  background: #e4f4eb;
+  color: #287b59;
+}
+
+/* Interactive controls */
+
+.sahyog-app main button,
+.sahyog-app main a {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.sahyog-app main button:hover {
+  border-color: #a9d4c9;
+}
+
+.sahyog-app main button:focus-visible,
+.sahyog-app main a:focus-visible,
+.sahyog-app main input:focus-visible,
+.sahyog-app main textarea:focus-visible,
+.sahyog-app main select:focus-visible {
+  outline: 3px solid rgba(49, 140, 133, 0.45);
+  outline-offset: 3px;
+}
+
+/* Trust and demo notices */
+
+.sahyog-app main [class*="text-status-moderate"] {
+  color: #94621b;
+}
+
+.sahyog-app main [class*="border-status-moderate"] {
+  border-color: #ead7ae;
+}
+
+.sahyog-app main [class*="bg-status-moderate\\/5"] {
+  background: #fff8e9;
+}
+
+.sahyog-app main [class*="border-status-low"] {
+  border-color: #cce6d8;
+}
+
+/* Tables */
+
+.sahyog-app main table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sahyog-app main thead {
+  background: #f0f7f4;
+}
+
+.sahyog-app main th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: #536b7d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.075em;
+  white-space: nowrap;
+}
+
+.sahyog-app main td,
+.sahyog-app main th {
+  border-color: #e2ebe7;
+}
+
+.sahyog-app main tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.sahyog-app main tbody tr:hover {
+  background: #f0f8f4;
+}
+
+.sahyog-app main tbody td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.sahyog-app main tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Status badges */
+
+.sahyog-app main [class*="text-status-low"] {
+  color: #287b59;
+}
+
+.sahyog-app main [class*="text-status-high"],
+.sahyog-app main [class*="text-status-urgent"] {
+  color: #b54e59;
+}
+
+.sahyog-app main [class*="text-status-moderate"] {
+  color: #94651b;
+}
+
+/* Charts */
+
+.sahyog-app main .recharts-wrapper {
+  max-width: 100%;
+}
+
+.sahyog-app main .recharts-cartesian-grid line {
+  stroke: #e6eeea;
+  stroke-dasharray: 4 5;
+}
+
+.sahyog-app main .recharts-text {
+  fill: #667b8c;
+  font-size: 11px;
+}
+
+.sahyog-app main .recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Footer */
+
+.sahyog-app main footer {
+  color: #667b8c;
+  border-color: #dfe9e5;
+  line-height: 1.8;
+}
+
+/* Mobile and tablet layout */
+
+@media (max-width: 1023px) {
+  .sahyog-sidebar {
+    box-shadow: 12px 0 36px rgba(16, 41, 65, 0.2);
+  }
+
+  .sahyog-app main > header {
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .sahyog-app {
+    font-size: 13px;
+  }
+
+  .sahyog-app main > div {
+    max-width: 100%;
+  }
+
+  .sahyog-app main h2 {
+    font-size: 23px;
+  }
+
+  .sahyog-app main section {
+    border-radius: 12px;
+  }
+
+  .sahyog-app main table {
+    font-size: 11px;
+  }
+
+  .sahyog-app main tbody td {
+    padding: 10px 8px;
+  }
+
+  .sahyog-app main footer {
+    line-height: 1.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sahyog-app *,
+  .sahyog-app *::before,
+  .sahyog-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
