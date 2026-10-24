@@ -23,3 +23,28 @@ Thumbs.db
 
 # Logs
 *.log
+
+
+# Local databases
+backend/sahyog.db
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+# DAIC-WOZ dataset and downloaded participant data
+backend/ml/data/
+backend/ml/artifacts/
+**/*_P.zip
+**/*_TRANSCRIPT.csv
+
+# Python generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example

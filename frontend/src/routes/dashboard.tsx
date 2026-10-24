@@ -58,6 +58,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { createComplaint } from "../lib/complaint-api";
 import {
   Select,
   SelectContent,
@@ -85,6 +86,7 @@ import {
   type ScoreSettings,
   type ThresholdKey,
 } from "@/lib/demo-data";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -432,11 +434,6 @@ function SahyogApp() {
             <SettingsPage settings={settings} setSettings={setSettings} />
           )}
         </div>
-        <footer className="mx-4 border-t border-border py-5 text-center text-[11px] text-muted-foreground sm:mx-7 lg:mx-9">
-          <span className="font-medium text-foreground">Prototype only.</span>{" "}
-          Fictional records and rule-based illustrative indicators—not clinical
-          advice or a validated assessment.
-        </footer>
       </main>
       {toast && (
         <div
@@ -759,10 +756,15 @@ function OverviewPage({
   const urgentCases = cases.filter(
     (item) => item.priority === "Urgent review" && item.status !== "Reviewed",
   );
-  const activeReferrals = referrals.filter((item) => item.status !== "Completed");
-  const needsAttention = [...urgentCases, ...pendingCases.filter(
-    (item) => !urgentCases.some((urgentCase) => urgentCase.id === item.id),
-  )].slice(0, 4);
+  const activeReferrals = referrals.filter(
+    (item) => item.status !== "Completed",
+  );
+  const needsAttention = [
+    ...urgentCases,
+    ...pendingCases.filter(
+      (item) => !urgentCases.some((urgentCase) => urgentCase.id === item.id),
+    ),
+  ].slice(0, 4);
 
   const trend = [
     { month: "May", count: 18 },
@@ -774,10 +776,26 @@ function OverviewPage({
   ];
 
   const categories = [
-    { name: "Low", value: cases.filter((item) => item.priority === "Low").length, fill: "#24856f" },
-    { name: "Moderate", value: cases.filter((item) => item.priority === "Moderate").length, fill: "#c58a22" },
-    { name: "High", value: cases.filter((item) => item.priority === "High").length, fill: "#d86f43" },
-    { name: "Urgent review", value: cases.filter((item) => item.priority === "Urgent review").length, fill: "#c74755" },
+    {
+      name: "Low",
+      value: cases.filter((item) => item.priority === "Low").length,
+      fill: "#24856f",
+    },
+    {
+      name: "Moderate",
+      value: cases.filter((item) => item.priority === "Moderate").length,
+      fill: "#c58a22",
+    },
+    {
+      name: "High",
+      value: cases.filter((item) => item.priority === "High").length,
+      fill: "#d86f43",
+    },
+    {
+      name: "Urgent review",
+      value: cases.filter((item) => item.priority === "Urgent review").length,
+      fill: "#c74755",
+    },
   ];
 
   return (
@@ -787,57 +805,220 @@ function OverviewPage({
         <div className="pointer-events-none absolute right-24 top-24 size-24 rounded-full bg-[#d9efea]/70 blur-2xl" />
         <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold tracking-tight text-[#153653] sm:text-3xl">A clearer view of the support queue.</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-[#153653] sm:text-3xl">
+              A clearer view of the support queue.
+            </h2>
             <p className="mt-2 max-w-xl text-sm leading-6 text-[#526b80]">
-              Review the current workload, spot cases awaiting a human response, and coordinate follow-up—all in one place.
+              Review the current workload, spot cases awaiting a human response,
+              and coordinate follow-up—all in one place.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium text-[#355a70]">
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><ShieldCheck className="size-4 text-[#24856f]" /> Human-led decisions</span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><LockKeyhole className="size-4 text-[#24856f]" /> Respectful by design</span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2"><Activity className="size-4 text-[#24856f]" /> Illustrative demo data</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2">
+                <ShieldCheck className="size-4 text-[#24856f]" /> Human-led
+                decisions
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2">
+                <LockKeyhole className="size-4 text-[#24856f]" /> Respectful by
+                design
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2">
+                <Activity className="size-4 text-[#24856f]" /> Illustrative demo
+                data
+              </span>
             </div>
           </div>
           <div className="relative flex shrink-0 flex-wrap gap-2">
-            <Button variant="outline" onClick={() => onNavigate("Case Management")} className="gap-2 border-[#c8dcd8] bg-white text-[#183b56] hover:bg-[#f3faf8]">
+            <Button
+              variant="outline"
+              onClick={() => onNavigate("Case Management")}
+              className="gap-2 border-[#c8dcd8] bg-white text-[#183b56] hover:bg-[#f3faf8]"
+            >
               <ClipboardList className="size-4" /> View case queue
             </Button>
           </div>
         </div>
       </div>
 
-      <section aria-label="Workspace statistics" className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+      <section
+        aria-label="Workspace statistics"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4"
+      >
         <div className="group rounded-xl border border-[#d9e7e5] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Active cases</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{cases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]"><BriefcaseBusiness className="size-5" /></span></div>
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Across the demo queue</span><button className="text-[11px] font-bold text-[#167d70] hover:underline" onClick={() => onNavigate("Case Management")}>View queue <ArrowRight className="ml-1 inline size-3.5" /></button></div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#607589]">
+                Active cases
+              </p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">
+                {cases.length}
+              </p>
+            </div>
+            <span className="grid size-11 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]">
+              <BriefcaseBusiness className="size-5" />
+            </span>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3">
+            <span className="text-[11px] text-[#6a7f90]">
+              Across the demo queue
+            </span>
+            <button
+              className="text-[11px] font-bold text-[#167d70] hover:underline"
+              onClick={() => onNavigate("Case Management")}
+            >
+              View queue <ArrowRight className="ml-1 inline size-3.5" />
+            </button>
+          </div>
         </div>
         <div className="group rounded-xl border border-[#eadfbe] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Pending human reviews</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{pendingCases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#fff4d9] text-[#a76c0d]"><UsersRound className="size-5" /></span></div>
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Awaiting responder attention</span><span className="rounded-full bg-[#fff4d9] px-2 py-1 text-[10px] font-bold text-[#94600d]">Needs review</span></div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#607589]">
+                Pending human reviews
+              </p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">
+                {pendingCases.length}
+              </p>
+            </div>
+            <span className="grid size-11 place-items-center rounded-xl bg-[#fff4d9] text-[#a76c0d]">
+              <UsersRound className="size-5" />
+            </span>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3">
+            <span className="text-[11px] text-[#6a7f90]">
+              Awaiting responder attention
+            </span>
+            <span className="rounded-full bg-[#fff4d9] px-2 py-1 text-[10px] font-bold text-[#94600d]">
+              Needs review
+            </span>
+          </div>
         </div>
         <div className="group rounded-xl border border-[#f0d6d8] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">High-priority reviews</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{urgentCases.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#ffebed] text-[#c74755]"><ShieldAlert className="size-5" /></span></div>
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Human review required</span><span className="rounded-full bg-[#ffebed] px-2 py-1 text-[10px] font-bold text-[#b53b49]">Prioritise</span></div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#607589]">
+                High-priority reviews
+              </p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">
+                {urgentCases.length}
+              </p>
+            </div>
+            <span className="grid size-11 place-items-center rounded-xl bg-[#ffebed] text-[#c74755]">
+              <ShieldAlert className="size-5" />
+            </span>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3">
+            <span className="text-[11px] text-[#6a7f90]">
+              Human review required
+            </span>
+            <span className="rounded-full bg-[#ffebed] px-2 py-1 text-[10px] font-bold text-[#b53b49]">
+              Prioritise
+            </span>
+          </div>
         </div>
         <div className="group rounded-xl border border-[#d9e7e5] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold text-[#607589]">Referrals in progress</p><p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">{activeReferrals.length}</p></div><span className="grid size-11 place-items-center rounded-xl bg-[#e8f5ed] text-[#24805b]"><HeartHandshake className="size-5" /></span></div>
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3"><span className="text-[11px] text-[#6a7f90]">Mock referrals only</span><button className="text-[11px] font-bold text-[#167d70] hover:underline" onClick={() => onNavigate("Referrals")}>View referrals <ArrowRight className="ml-1 inline size-3.5" /></button></div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#607589]">
+                Referrals in progress
+              </p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-[#153653]">
+                {activeReferrals.length}
+              </p>
+            </div>
+            <span className="grid size-11 place-items-center rounded-xl bg-[#e8f5ed] text-[#24805b]">
+              <HeartHandshake className="size-5" />
+            </span>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#edf2f1] pt-3">
+            <span className="text-[11px] text-[#6a7f90]">
+              Mock referrals only
+            </span>
+            <button
+              className="text-[11px] font-bold text-[#167d70] hover:underline"
+              onClick={() => onNavigate("Referrals")}
+            >
+              View referrals <ArrowRight className="ml-1 inline size-3.5" />
+            </button>
+          </div>
         </div>
       </section>
 
       <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.5fr)_minmax(330px,0.85fr)]">
         <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
-          <SectionHeading title="Case activity" caption="Illustrative case volumes · May–October 2026" action={<Badge variant="outline" className="border-[#d8e6e3] bg-[#f4faf8] text-[10px] text-[#427064]">DEMO DATA</Badge>} />
+          <SectionHeading
+            title="Case activity"
+            caption="Illustrative case volumes · May–October 2026"
+            action={
+              <Badge
+                variant="outline"
+                className="border-[#d8e6e3] bg-[#f4faf8] text-[10px] text-[#427064]"
+              >
+                DEMO DATA
+              </Badge>
+            }
+          />
           <div className="px-3 pb-4 pt-2 sm:px-5">
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><p className="text-xs text-[#61788a]">Volume overview</p><p className="text-[10px] text-[#8092a0]">Illustrative values, not live operational metrics</p></div>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-[#61788a]">Volume overview</p>
+              <p className="text-[10px] text-[#8092a0]">
+                Illustrative values, not live operational metrics
+              </p>
+            </div>
             <div className="h-[245px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
-                  <defs><linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#238b80" stopOpacity={0.28} /><stop offset="95%" stopColor="#238b80" stopOpacity={0.02} /></linearGradient></defs>
-                  <CartesianGrid vertical={false} stroke="#e6eeec" strokeDasharray="4 5" />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: "#718697", fontSize: 11 }} tickMargin={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: "#718697", fontSize: 11 }} width={34} />
-                  <Tooltip contentStyle={{ borderColor: "#dce7e5", borderRadius: 10, fontSize: 12, boxShadow: "0 8px 24px rgba(20,50,70,.08)" }} />
-                  <Area dataKey="count" name="Illustrative cases" type="monotone" stroke="#238b80" strokeWidth={3} fill="url(#volumeFill)" activeDot={{ r: 5, strokeWidth: 0, fill: "#153653" }} />
+                <AreaChart
+                  data={trend}
+                  margin={{ top: 10, right: 8, left: -18, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor="#238b80"
+                        stopOpacity={0.28}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="#238b80"
+                        stopOpacity={0.02}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    vertical={false}
+                    stroke="#e6eeec"
+                    strokeDasharray="4 5"
+                  />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "#718697", fontSize: 11 }}
+                    tickMargin={10}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "#718697", fontSize: 11 }}
+                    width={34}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderColor: "#dce7e5",
+                      borderRadius: 10,
+                      fontSize: 12,
+                      boxShadow: "0 8px 24px rgba(20,50,70,.08)",
+                    }}
+                  />
+                  <Area
+                    dataKey="count"
+                    name="Illustrative cases"
+                    type="monotone"
+                    stroke="#238b80"
+                    strokeWidth={3}
+                    fill="url(#volumeFill)"
+                    activeDot={{ r: 5, strokeWidth: 0, fill: "#153653" }}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -845,50 +1026,266 @@ function OverviewPage({
         </section>
 
         <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
-          <SectionHeading title="Priority distribution" caption="Rule-based categories across mock cases" action={<span className="rounded-lg bg-[#f2f8f6] px-2.5 py-1 text-[10px] font-semibold text-[#507366]">{cases.length} total</span>} />
+          <SectionHeading
+            title="Priority distribution"
+            caption="Rule-based categories across mock cases"
+            action={
+              <span className="rounded-lg bg-[#f2f8f6] px-2.5 py-1 text-[10px] font-semibold text-[#507366]">
+                {cases.length} total
+              </span>
+            }
+          />
           <div className="grid grid-cols-[138px_minmax(0,1fr)] items-center gap-1 px-3 py-3 sm:grid-cols-[155px_minmax(0,1fr)] sm:px-4">
             <div className="relative h-[175px]">
-              <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categories} dataKey="value" nameKey="name" innerRadius={49} outerRadius={70} paddingAngle={3} stroke="#fff" strokeWidth={3}>{categories.map((item) => <Cell key={item.name} fill={item.fill} />)}</Pie><Tooltip /></PieChart></ResponsiveContainer>
-              <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-2xl font-bold text-[#153653]">{cases.length}</p><p className="mt-0.5 text-[9px] font-semibold tracking-[0.12em] text-[#738797]">CASES</p></div></div>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categories}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={49}
+                    outerRadius={70}
+                    paddingAngle={3}
+                    stroke="#fff"
+                    strokeWidth={3}
+                  >
+                    {categories.map((item) => (
+                      <Cell key={item.name} fill={item.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
+                <div>
+                  <p className="text-2xl font-bold text-[#153653]">
+                    {cases.length}
+                  </p>
+                  <p className="mt-0.5 text-[9px] font-semibold tracking-[0.12em] text-[#738797]">
+                    CASES
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="space-y-3 pr-1">
-              {categories.map((item) => <div key={item.name} className="flex items-center justify-between gap-2"><span className="flex min-w-0 items-center gap-2 text-[11px] text-[#536d80]"><span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: item.fill }} />{item.name}</span><span className="text-sm font-bold tabular-nums text-[#183b56]">{item.value}</span></div>)}
+              {categories.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between gap-2"
+                >
+                  <span className="flex min-w-0 items-center gap-2 text-[11px] text-[#536d80]">
+                    <span
+                      className="size-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: item.fill }}
+                    />
+                    {item.name}
+                  </span>
+                  <span className="text-sm font-bold tabular-nums text-[#183b56]">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="border-t border-[#edf2f1] bg-[#f8fbfa] px-4 py-3 text-[10px] leading-5 text-[#718697]">These categories are illustrative indicators only. They do not represent a validated model score or clinical judgement.</div>
+          <div className="border-t border-[#edf2f1] bg-[#f8fbfa] px-4 py-3 text-[10px] leading-5 text-[#718697]">
+            These categories are illustrative indicators only. They do not
+            represent a validated model score or clinical judgement.
+          </div>
         </section>
       </div>
 
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
         <section className="self-start overflow-hidden rounded-2xl border border-[#dce9e6] bg-white shadow-[0_8px_28px_rgba(21,54,83,0.045)]">
-          <SectionHeading title="Cases needing attention" caption="A focused queue for the next human review" action={<Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-[#d6e5e2] text-[#24566a] hover:bg-[#f2faf7]" onClick={() => onNavigate("Case Management")}>Open queue <ArrowRight className="size-3.5" /></Button>} />
+          <SectionHeading
+            title="Cases needing attention"
+            caption="A focused queue for the next human review"
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 rounded-lg border-[#d6e5e2] text-[#24566a] hover:bg-[#f2faf7]"
+                onClick={() => onNavigate("Case Management")}
+              >
+                Open queue <ArrowRight className="size-3.5" />
+              </Button>
+            }
+          />
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#edf2f1] bg-[#f8fbfa] px-4 py-3 sm:px-5">
-            <span className="text-xs text-[#607789]">Prioritise these records for review</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f3d4d7] bg-white px-2.5 py-1 text-[10px] font-bold text-[#b94350]"><span className="size-1.5 rounded-full bg-[#cf5260]" /> {needsAttention.length} requiring attention</span>
+            <span className="text-xs text-[#607789]">
+              Prioritise these records for review
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f3d4d7] bg-white px-2.5 py-1 text-[10px] font-bold text-[#b94350]">
+              <span className="size-1.5 rounded-full bg-[#cf5260]" />{" "}
+              {needsAttention.length} requiring attention
+            </span>
           </div>
-          {needsAttention.length > 0 ? <div className="divide-y divide-[#edf2f1]">{needsAttention.map((item) => <button key={item.id} onClick={() => onOpenCase(item.id)} className="group flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f6fbf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2b9a87] sm:gap-4 sm:px-5"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-inset ${item.priority === "Urgent review" ? "bg-[#fff0f1] text-[#c74755] ring-[#f6d8dc]" : "bg-[#fff7e5] text-[#a76c0d] ring-[#f1e1b8]"}`}><ShieldAlert className="size-[18px]" /></span><span className="min-w-0 flex-1"><span className="flex flex-wrap items-center gap-2"><strong className="text-sm font-bold tracking-[-0.01em] text-[#183b56] group-hover:text-[#147c76]">{item.id}</strong><PriorityBadge priority={item.priority} /></span><span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#718697]"><span>{item.language}</span><span className="text-[#bdc9c8]">•</span><span>{item.assigned}</span></span></span><span className="hidden sm:block"><StatusBadge status={item.status} /></span><span className="grid size-8 shrink-0 place-items-center rounded-full text-[#76908f] transition group-hover:bg-white group-hover:text-[#167d70] group-hover:shadow-sm"><ChevronRight className="size-4" /></span></button>)}</div> : <div className="px-5 py-10 text-center"><span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#e8f6ef] text-[#24856f]"><CheckCircle2 className="size-6" /></span><p className="mt-3 text-sm font-semibold text-[#183b56]">No cases in this attention list</p><p className="mt-1 text-xs text-[#718697]">Check the full queue for the latest case status.</p></div>}
-          <div className="border-t border-[#edf2f1] px-4 py-3 text-[10px] leading-5 text-[#718697] sm:px-5">Priority labels are illustrative. Review each case's context and follow your organisation's protocols.</div>
+          {needsAttention.length > 0 ? (
+            <div className="divide-y divide-[#edf2f1]">
+              {needsAttention.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => onOpenCase(item.id)}
+                  className="group flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f6fbf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2b9a87] sm:gap-4 sm:px-5"
+                >
+                  <span
+                    className={`grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-inset ${item.priority === "Urgent review" ? "bg-[#fff0f1] text-[#c74755] ring-[#f6d8dc]" : "bg-[#fff7e5] text-[#a76c0d] ring-[#f1e1b8]"}`}
+                  >
+                    <ShieldAlert className="size-[18px]" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <strong className="text-sm font-bold tracking-[-0.01em] text-[#183b56] group-hover:text-[#147c76]">
+                        {item.id}
+                      </strong>
+                      <PriorityBadge priority={item.priority} />
+                    </span>
+                    <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#718697]">
+                      <span>{item.language}</span>
+                      <span className="text-[#bdc9c8]">•</span>
+                      <span>{item.assigned}</span>
+                    </span>
+                  </span>
+                  <span className="hidden sm:block">
+                    <StatusBadge status={item.status} />
+                  </span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full text-[#76908f] transition group-hover:bg-white group-hover:text-[#167d70] group-hover:shadow-sm">
+                    <ChevronRight className="size-4" />
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="px-5 py-10 text-center">
+              <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#e8f6ef] text-[#24856f]">
+                <CheckCircle2 className="size-6" />
+              </span>
+              <p className="mt-3 text-sm font-semibold text-[#183b56]">
+                No cases in this attention list
+              </p>
+              <p className="mt-1 text-xs text-[#718697]">
+                Check the full queue for the latest case status.
+              </p>
+            </div>
+          )}
+          <div className="border-t border-[#edf2f1] px-4 py-3 text-[10px] leading-5 text-[#718697] sm:px-5">
+            Priority labels are illustrative. Review each case's context and
+            follow your organisation's protocols.
+          </div>
         </section>
 
         <section className="self-start overflow-hidden rounded-2xl border border-[#dce9e6] bg-white shadow-[0_8px_28px_rgba(21,54,83,0.045)]">
-          <SectionHeading title="Workflow at a glance" caption="From listening to coordinated support" />
+          <SectionHeading
+            title="Workflow at a glance"
+            caption="From listening to coordinated support"
+          />
           <div className="px-4 py-3 sm:px-5">
             <div className="relative space-y-1">
-              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]"><MessageSquareText className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#24856f]">STEP 01</span><p className="text-sm font-bold text-[#183b56]">Listen and document</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Capture reported concerns respectfully and keep the person's context in view.</p></div></div>
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#e5f4ef] text-[#167d70]">
+                  <MessageSquareText className="size-[18px]" />
+                </span>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.12em] text-[#24856f]">
+                      STEP 01
+                    </span>
+                    <p className="text-sm font-bold text-[#183b56]">
+                      Listen and document
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-[#6a7f90]">
+                    Capture reported concerns respectfully and keep the person's
+                    context in view.
+                  </p>
+                </div>
+              </div>
               <div className="ml-8 h-4 border-l-2 border-dotted border-[#c8dcd8]" />
-              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#edf0ff] text-[#6556a8]"><BrainCircuit className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#6556a8]">STEP 02</span><p className="text-sm font-bold text-[#183b56]">Organise for human review</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Structure information to support responders—not to make automatic decisions.</p></div></div>
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#edf0ff] text-[#6556a8]">
+                  <BrainCircuit className="size-[18px]" />
+                </span>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.12em] text-[#6556a8]">
+                      STEP 02
+                    </span>
+                    <p className="text-sm font-bold text-[#183b56]">
+                      Organise for human review
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-[#6a7f90]">
+                    Structure information to support responders—not to make
+                    automatic decisions.
+                  </p>
+                </div>
+              </div>
               <div className="ml-8 h-4 border-l-2 border-dotted border-[#c8dcd8]" />
-              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff1e7] text-[#b9683f]"><LifeBuoy className="size-[18px]" /></span><div className="min-w-0 flex-1 pt-0.5"><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold tracking-[0.12em] text-[#b9683f]">STEP 03</span><p className="text-sm font-bold text-[#183b56]">Coordinate appropriate support</p></div><p className="mt-1 text-xs leading-5 text-[#6a7f90]">Track follow-up and referrals with trained people remaining responsible.</p></div></div>
+              <div className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-[#f7fbfa]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff1e7] text-[#b9683f]">
+                  <LifeBuoy className="size-[18px]" />
+                </span>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.12em] text-[#b9683f]">
+                      STEP 03
+                    </span>
+                    <p className="text-sm font-bold text-[#183b56]">
+                      Coordinate appropriate support
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-[#6a7f90]">
+                    Track follow-up and referrals with trained people remaining
+                    responsible.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="mt-3 rounded-xl border border-[#d7ebe3] bg-gradient-to-br from-[#f0faf6] to-[#f8fbfa] p-3.5"><div className="flex items-start gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#24856f] shadow-sm"><ShieldCheck className="size-4" /></span><div><p className="text-xs font-bold text-[#1c5d55]">Human judgement stays central</p><p className="mt-1 text-[11px] leading-5 text-[#5e7b76]">SAHYOG AI supports a prototype workflow; it does not diagnose, validate risk, or contact external services.</p></div></div></div>
+            <div className="mt-3 rounded-xl border border-[#d7ebe3] bg-gradient-to-br from-[#f0faf6] to-[#f8fbfa] p-3.5">
+              <div className="flex items-start gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#24856f] shadow-sm">
+                  <ShieldCheck className="size-4" />
+                </span>
+                <div>
+                  <p className="text-xs font-bold text-[#1c5d55]">
+                    Human judgement stays central
+                  </p>
+                  <p className="mt-1 text-[11px] leading-5 text-[#5e7b76]">
+                    SAHYOG AI supports a prototype workflow; it does not
+                    diagnose, validate risk, or contact external services.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </div>
 
       <section className="overflow-hidden rounded-xl border border-[#dce7e5] bg-white shadow-sm">
-        <SectionHeading title="Recent cases" caption="Fictional case records · open a record to review its details" action={<Button variant="outline" size="sm" className="hidden gap-2 border-[#d6e5e2] text-[#24566a] sm:inline-flex" onClick={() => onNavigate("Case Management")}>All cases <ArrowRight className="size-4" /></Button>} />
+        <SectionHeading
+          title="Recent cases"
+          caption="Fictional case records · open a record to review its details"
+          action={
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden gap-2 border-[#d6e5e2] text-[#24566a] sm:inline-flex"
+              onClick={() => onNavigate("Case Management")}
+            >
+              All cases <ArrowRight className="size-4" />
+            </Button>
+          }
+        />
         <CaseTable cases={cases} onOpenCase={onOpenCase} compact />
-        <div className="border-t border-[#edf2f1] bg-[#fbfdfc] px-4 py-3 sm:hidden"><Button variant="outline" size="sm" className="w-full" onClick={() => onNavigate("Case Management")}>View all cases <ArrowRight className="size-4" /></Button></div>
+        <div className="border-t border-[#edf2f1] bg-[#fbfdfc] px-4 py-3 sm:hidden">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => onNavigate("Case Management")}
+          >
+            View all cases <ArrowRight className="size-4" />
+          </Button>
+        </div>
       </section>
     </div>
   );
@@ -925,6 +1322,9 @@ function AssessmentPage({
   const [language, setLanguage] = useState("English");
   const [mode, setMode] = useState<"Text" | "Transcript">("Text");
   const [transcript, setTranscript] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const voiceRecognitionRef = useRef<any>(null);
+  const voiceBaseTextRef = useRef("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -937,7 +1337,88 @@ function AssessmentPage({
     setError("");
     setCreatedId(null);
   };
-  const submit = (event: FormEvent) => {
+
+  const startVoiceInput = () => {
+    const speechWindow = window as any;
+    const SpeechRecognition =
+      speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setError(
+        "Voice input is not supported by this browser. Please use Google Chrome or type your narrative instead.",
+      );
+      return;
+    }
+
+    setError("");
+    setMode("Transcript");
+    setResult(null);
+    setCreatedId(null);
+
+    voiceBaseTextRef.current = transcript.trim()
+      ? `${transcript.trim()} `
+      : narrative.trim()
+        ? `${narrative.trim()} `
+        : "";
+
+    const recognition = new SpeechRecognition();
+    voiceRecognitionRef.current = recognition;
+
+    recognition.lang = language === "Hindi" ? "hi-IN" : "en-US";
+
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let recognizedText = "";
+
+      for (let i = 0; i < event.results.length; i++) {
+        recognizedText += event.results[i][0].transcript;
+      }
+
+      setTranscript(`${voiceBaseTextRef.current}${recognizedText}`.trim());
+    };
+
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+
+      if (event.error !== "no-speech") {
+        setError(
+          `Voice input error: ${event.error}. You can continue by typing.`,
+        );
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setError("Could not start voice input. Please try again.");
+    }
+  };
+
+  const stopVoiceInput = () => {
+    voiceRecognitionRef.current?.stop();
+    setIsListening(false);
+  };
+
+  const clearNarrative = () => {
+    stopVoiceInput();
+    setNarrative("");
+    setTranscript("");
+    setResult(null);
+    setCreatedId(null);
+    setError("");
+  };
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (sourceText.trim().length < 12) {
       setError(
@@ -955,18 +1436,29 @@ function AssessmentPage({
     setLoading(true);
     setResult(null);
     setCreatedId(null);
-    window.setTimeout(() => {
-      const mock = assessDemonstration(sourceText, settings);
-      const id = `SY-${String(26020 + cases.length - 10).padStart(5, "0")}`;
-      const date = new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
+
+    try {
+      const savedComplaint = await createComplaint({
+        description: sourceText,
+        language,
       });
+
+      const mock = assessDemonstration(sourceText, settings);
+      const id = String(savedComplaint.id);
+
+      const date = new Date(savedComplaint.created_at).toLocaleDateString(
+        "en-GB",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        },
+      );
+
       const created: DemoCase = {
         id,
         date,
-        language,
+        language: savedComplaint.language,
         status: "Pending review",
         assigned: "Unassigned",
         score: mock.score,
@@ -981,25 +1473,30 @@ function AssessmentPage({
           `${date} · Rule-based demonstration run · Human review required`,
         ],
       };
+
       onSubmitCase(created);
       setResult(mock);
       setCreatedId(id);
+    } catch (error) {
+      console.error("Failed to save complaint:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Could not save the complaint. Please try again.",
+      );
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
   return (
     <>
       <PageIntro
-        eyebrow="WORKSPACE / INTAKE"
-        title="New assessment"
-        description="Capture a fictional complaint narrative for a transparent, rule-based demonstration. A human responder remains responsible for every decision."
+        eyebrow="CASE INTAKE"
+        title="New Assessment"
+        description="Record the person's concerns, review the available information, and identify appropriate next steps for support."
       />
-      <DemoNotice>
-        <strong>Demonstration only.</strong> Do not enter real names, contact
-        details, or personal reports. This prototype does not use AI and does
-        not provide clinical assessment.
-      </DemoNotice>
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(310px,0.85fr)]">
+
+      <div className="mt-4 grid items-start gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
         <form
           onSubmit={submit}
           className="space-y-5 rounded-2xl border border-[#DCE7E2] bg-white p-5 sm:p-7 shadow-xs"
@@ -1026,33 +1523,51 @@ function AssessmentPage({
               </select>
             </label>
             <fieldset>
-              <legend className="text-xs font-medium">Input mode</legend>
-              <div className="mt-2 grid h-10 grid-cols-2 border border-border bg-muted/40 p-0.5">
-                <Button
+              <legend className="text-xs font-semibold text-[#183B56]">
+                Input method
+              </legend>
+
+              <div className="mt-2 grid h-11 grid-cols-2 gap-1 rounded-xl border border-[#DCE7E2] bg-[#F4F8F7] p-1">
+                <button
                   type="button"
-                  variant={mode === "Text" ? "secondary" : "ghost"}
-                  className="h-full rounded-sm text-xs"
-                  onClick={() => setMode("Text")}
+                  onClick={() => {
+                    stopVoiceInput();
+                    setMode("Text");
+                    setNarrative(transcript || narrative);
+                    setError("");
+                  }}
+                  className={`rounded-lg text-sm font-medium transition ${
+                    mode === "Text"
+                      ? "bg-white text-[#123052] shadow-sm"
+                      : "text-[#62778A] hover:text-[#123052]"
+                  }`}
                 >
-                  Text
-                </Button>
-                <Button
+                  Type narrative
+                </button>
+
+                <button
                   type="button"
-                  variant={mode === "Transcript" ? "secondary" : "ghost"}
-                  className="h-full rounded-sm text-xs"
-                  onClick={() => setMode("Transcript")}
+                  onClick={() => {
+                    stopVoiceInput();
+                    setMode("Transcript");
+                    setTranscript(narrative || transcript);
+                    setError("");
+                  }}
+                  className={`rounded-lg text-sm font-medium transition ${
+                    mode === "Transcript"
+                      ? "bg-white text-[#123052] shadow-sm"
+                      : "text-[#62778A] hover:text-[#123052]"
+                  }`}
                 >
-                  Transcript
-                </Button>
+                  Voice / transcript
+                </button>
               </div>
             </fieldset>
           </div>
           <div>
             <div className="flex items-center justify-between gap-3">
               <label htmlFor="narrative" className="text-xs font-medium">
-                {mode === "Text"
-                  ? "Fictional complaint narrative"
-                  : "Fictional transcript"}{" "}
+                {mode === "Text" ? "complaint narrative" : "Transcript"}{" "}
                 <span className="text-status-urgent">*</span>
               </label>
               <span className="text-[10px] text-muted-foreground">
@@ -1079,27 +1594,75 @@ function AssessmentPage({
               required.
             </p>
           </div>
-          <div className="border border-dashed border-border bg-muted/20 p-4">
-            <div className="flex items-start gap-3">
-              <div className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
-                <Activity className="size-4" />
+          <div className="rounded-xl border border-[#DCE7E2] bg-[#F7FAF9] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#E4F3EF] text-[#168477]">
+                  <Activity className="size-5" />
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-[#183B56]">
+                    Voice-assisted entry
+                  </p>
+                  <p className="mt-1 max-w-md text-xs leading-5 text-[#62778A]">
+                    Dictate a fictional example, then review and edit the
+                    transcript before analysis. Microphone permission may be
+                    required.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-medium">
-                  Voice input{" "}
-                  <Badge
+
+              <div className="flex flex-wrap gap-2">
+                {!isListening ? (
+                  <Button
+                    type="button"
                     variant="outline"
-                    className="ml-1 rounded-sm text-[9px]"
+                    size="sm"
+                    onClick={startVoiceInput}
+                    className="gap-2 border-[#BBDCD5] text-[#147E76]"
                   >
-                    FUTURE PLACEHOLDER
-                  </Badge>
-                </p>
-                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-                  Voice recording and speech transcription are not available in
-                  this prototype.
-                </p>
+                    <Activity className="size-4" />
+                    Start speaking
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={stopVoiceInput}
+                    className="gap-2 border-red-200 text-red-600"
+                  >
+                    <span className="size-2 animate-pulse rounded-full bg-red-500" />
+                    Stop listening
+                  </Button>
+                )}
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearNarrative}
+                >
+                  Clear
+                </Button>
               </div>
             </div>
+
+            {isListening && (
+              <p
+                role="status"
+                className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700"
+              >
+                Listening… Speak clearly. Select Stop listening when finished.
+              </p>
+            )}
+
+            <p className="mt-3 text-[11px] leading-5 text-[#62778A]">
+              Voice recognition depends on browser support and may use a browser
+              provider's speech service. Do not dictate real names, contact
+              details, or sensitive personal reports in this demonstration.
+            </p>
           </div>
           <label className="flex cursor-pointer items-start gap-3 border-t border-border pt-4">
             <input
@@ -1108,11 +1671,6 @@ function AssessmentPage({
               checked={consent}
               onChange={(event) => setConsent(event.target.checked)}
             />
-            <span className="text-[11px] leading-5 text-muted-foreground">
-              I understand that this is a fictional interface demonstration. No
-              real complaint is submitted or stored, and the displayed
-              indicators do not establish a diagnosis or determine safety.
-            </span>
           </label>
           {error && (
             <p
@@ -1122,21 +1680,13 @@ function AssessmentPage({
               {error}
             </p>
           )}
+
           <Button
             type="submit"
             disabled={loading}
-            className="w-full gap-2 sm:w-auto"
+            className="mt-4 w-full justify-center gap-2 sm:w-auto"
           >
-            {loading ? (
-              <>
-                <span className="size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />{" "}
-                Producing illustrative result…
-              </>
-            ) : (
-              <>
-                <Sparkles /> Analyze Indicators
-              </>
-            )}
+            {loading ? "Submitting..." : "Submit Assessment"}
           </Button>
         </form>
         <div className="space-y-5">
@@ -1442,10 +1992,6 @@ function CasesPage({
           </Button>
         }
       />
-      <DemoNotice>
-        All records below are synthetic demonstration cases. Avoid entering
-        personal information; no real case records are held in this prototype.
-      </DemoNotice>
       <section className="mt-5 border border-border bg-card">
         <div className="grid gap-3 border-b border-border p-4 sm:grid-cols-[minmax(200px,1fr)_170px_150px_auto] sm:items-center">
           <div className="relative">
@@ -1860,11 +2406,6 @@ function ReferralsPage({
           </Button>
         }
       />
-      <DemoNotice>
-        <strong>Human action only.</strong> Referrals in this prototype are
-        local records. Police intervention, emergency support, and every other
-        service are never initiated automatically.
-      </DemoNotice>
       {showForm && (
         <form
           onSubmit={create}
@@ -2071,11 +2612,6 @@ function ReportsPage({
           </Badge>
         }
       />
-      <DemoNotice>
-        <strong>Illustrative metrics only.</strong> These mock figures are not
-        validated model performance, official statistics, or evidence of
-        clinical effectiveness.
-      </DemoNotice>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {[
           {
@@ -2189,11 +2725,6 @@ function SettingsPage({
         title="Settings"
         description="Configure language preference and transparent demonstration scoring rules for this browser session."
       />
-      <DemoNotice>
-        These controls are for interface prototyping only. Thresholds and
-        weights are not clinically validated, and the settings are not
-        production security configuration.
-      </DemoNotice>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <section className="border border-border bg-card">
           <SectionHeading
@@ -2302,17 +2833,7 @@ function SettingsPage({
         <section className="border border-status-urgent/25 bg-status-urgent/5 p-5 lg:col-span-2">
           <div className="flex items-start gap-3">
             <ShieldAlert className="mt-0.5 size-5 shrink-0 text-status-urgent" />
-            <div>
-              <h3 className="text-xs font-semibold">Prototype disclaimer</h3>
-              <p className="mt-1.5 text-[11px] leading-5 text-muted-foreground">
-                SAHYOG AI is a frontend demonstration. Phrase matching and
-                scores are fictional, preliminary indicators—not a clinical
-                diagnosis or validated screening tool. Human review is required
-                for every case. No personal data, actual user management,
-                external AI, production security, or real helpline services are
-                configured.
-              </p>
-            </div>
+            <div></div>
           </div>
         </section>
       </div>

@@ -742,3 +742,22 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Remove unnecessary blank space in the dashboard layout */
+.dashboard-main {
+  align-content: start;
+  row-gap: 24px;
+}
+
+.cases-attention {
+  align-self: start;
+  height: fit-content;
+  min-height: 0;
+}
+
+.cases-attention-list {
+  height: auto;
+  min-height: 0;
+  padding-bottom: 0;
+}
