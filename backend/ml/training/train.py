@@ -54,6 +54,17 @@ def train_model(
 
     model.fit(X_train, y_train)
 
+    y_pred = model.predict(X_test)
+
+    from ml.evaluation.evaluate import evaluate_classifier
+
+    metrics = evaluate_classifier(
+        y_true=y_test.tolist(),
+        y_pred=y_pred.tolist(),
+        labels=[0, 1],
+        output_dir="ml/evaluation/results",
+    )
+
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output)
@@ -63,6 +74,13 @@ def train_model(
         "train_samples": len(X_train),
         "test_samples": len(X_test),
         "classes": [str(label) for label in model.classes_],
+        "metrics": {
+            "accuracy": metrics["accuracy"],
+            "macro_precision": metrics["macro_precision"],
+            "macro_recall": metrics["macro_recall"],
+            "macro_f1": metrics["macro_f1"],
+            "confusion_matrix": metrics["confusion_matrix"],
+        },
     }
 
 
