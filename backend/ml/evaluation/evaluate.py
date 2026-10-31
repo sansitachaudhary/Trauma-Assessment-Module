@@ -36,8 +36,23 @@ def evaluate_classifier(
             "Ground-truth labels and predictions must have equal lengths."
         )
 
+    if any(label is None for label in y_true) or any(
+        label is None for label in y_pred
+    ):
+        raise ValueError("Ground-truth labels and predictions cannot contain None.")
+
     if labels is None:
         labels = sorted(set(y_true) | set(y_pred), key=str)
+    else:
+        labels = list(labels)
+        if not labels:
+            raise ValueError("Evaluation labels cannot be empty.")
+
+        observed_labels = set(y_true) | set(y_pred)
+        if not observed_labels.issubset(set(labels)):
+            raise ValueError(
+                "Evaluation labels must include every true and predicted class."
+            )
 
     accuracy = accuracy_score(y_true, y_pred)
 
