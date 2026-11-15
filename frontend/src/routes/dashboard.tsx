@@ -59,6 +59,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { createComplaint } from "../lib/complaint-api";
+import { predictWithML, type MLPredictionResponse } from "@/lib/ml-api";
+
 import {
   Select,
   SelectContent,
@@ -1328,6 +1330,7 @@ function AssessmentPage({
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mlResult, setMlResult] = useState<MLPredictionResponse | null>(null);
   const [createdId, setCreatedId] = useState<string | null>(null);
   const sourceText = mode === "Transcript" ? transcript : narrative;
   const selectScenario = (text: string) => {
@@ -1442,6 +1445,9 @@ function AssessmentPage({
         description: sourceText,
         language,
       });
+
+      const prediction = await predictWithML(sourceText);
+      setMlResult(prediction);
 
       const mock = assessDemonstration(sourceText, settings);
       const id = String(savedComplaint.id);
