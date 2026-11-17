@@ -35,3 +35,18 @@ export async function createComplaint(
 
   return (await response.json()) as ComplaintResponse;
 }
+
+export async function getComplaints(): Promise<ComplaintResponse[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/complaints`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch complaints (${response.status})`);
+  }
+
+  return (await response.json()) as ComplaintResponse[];
+}

@@ -1,0 +1,33 @@
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+from app.services.ml_inference import predict_text
+
+
+router = APIRouter(
+    prefix="/api/v1/ml",
+    tags=["Experimental ML"],
+)
+
+
+class MLPredictionRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=20000)
+
+
+@router.post("/predict")
+def predict(payload: MLPredictionRequest):
+    try:
+        return predict_text(payload.text)
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=503,
+            detail="Experimental ML model is unavailable.",
+        )

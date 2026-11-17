@@ -10,6 +10,7 @@ from app.models.assessment import Assessment
 from app.models.case import Case
 from app.routers.complaints import router as complaints_router
 from app.routers.assessments import router as assessments_router
+from app.routers.ml import router as ml_router
 
 
 @asynccontextmanager
@@ -37,6 +38,8 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
     ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -71,3 +74,4 @@ def database_health_check():
 
 app.include_router(complaints_router)
 app.include_router(assessments_router)
+app.include_router(ml_router)

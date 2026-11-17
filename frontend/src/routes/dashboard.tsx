@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import "./dashboard.css";
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import {
   Activity,
   ArrowDownUp,
@@ -58,7 +64,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { createComplaint } from "../lib/complaint-api";
+import { createComplaint, getComplaints } from "../lib/complaint-api";
 import { predictWithML, type MLPredictionResponse } from "@/lib/ml-api";
 
 import {
@@ -151,6 +157,59 @@ function SahyogApp() {
   const [assessment, setAssessment] = useState<AssessmentOutcome | null>(null);
   const [assessmentNarrative, setAssessmentNarrative] = useState("");
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    getComplaints()
+      .then((complaints) => {
+        if (!active) return;
+        console.log(
+          "Complaints loaded from API:",
+          complaints.map((complaint) => complaint.id),
+        );
+
+        const savedCases: DemoCase[] = complaints.map((complaint) => ({
+          id: `DB-${complaint.id}`,
+          date: new Date(complaint.created_at).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+          language:
+            complaint.language === "en"
+              ? "English"
+              : complaint.language === "hi"
+                ? "Hindi"
+                : complaint.language,
+          status: "New",
+          assigned: "Unassigned",
+          score: 0,
+          priority: "Low",
+          summary: complaint.description.slice(0, 100),
+          narrative: complaint.description,
+          indicators: [],
+          notes: "New complaint received. Awaiting human review.",
+          followUpDate: "Not scheduled",
+          history: ["Complaint submitted"],
+        }));
+
+        setCases((existing) => {
+          const demoCases = existing.filter(
+            (item) => !item.id.startsWith("DB-"),
+          );
+
+          return [...savedCases, ...demoCases];
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to load saved complaints:", error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const selectedCase = cases.find((item) => item.id === selectedId) ?? null;
   const notify = (message: string) => {
@@ -1339,6 +1398,7 @@ function AssessmentPage({
     setResult(null);
     setError("");
     setCreatedId(null);
+    setMlResult(null);
   };
 
   const startVoiceInput = () => {
@@ -1420,6 +1480,7 @@ function AssessmentPage({
     setResult(null);
     setCreatedId(null);
     setError("");
+    setMlResult(null);
   };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -1760,6 +1821,51 @@ function AssessmentPage({
           </section>
         </div>
       </div>
+
+      {mlResult && (
+        <section className="mt-5 rounded-2xl border border-blue-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#123052]">
+            Experimental ML Prediction
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
+            DAIC-WOZ research model · {mlResult.model_version}
+          </p>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-gray-500">Predicted label</p>
+              <p className="mt-2 text-2xl font-bold text-[#123052]">
+                {mlResult.predicted_label}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-gray-500">Class 0 probability</p>
+              <p className="mt-2 text-2xl font-bold">
+                {((mlResult.class_probabilities["0"] ?? 0) * 100).toFixed(2)}%
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-gray-500">Class 1 probability</p>
+              <p className="mt-2 text-2xl font-bold">
+                {((mlResult.class_probabilities["1"] ?? 0) * 100).toFixed(2)}%
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <strong>Research use only.</strong>
+            <p className="mt-1">{mlResult.label_meaning}</p>
+            <p className="mt-1">
+              This experimental model is not clinically validated and must not
+              be used to diagnose trauma or PTSD. Human review is required.
+            </p>
+          </div>
+        </section>
+      )}
+
       {result && createdId && (
         <AssessmentResult
           result={result}
@@ -1986,7 +2092,7 @@ function CasesPage({
       <PageIntro
         eyebrow="WORKSPACE / RECORDS"
         title="Case management"
-        description="Search and review fictional cases. Select a record to inspect the narrative, history, and responder notes."
+        description="Search and review submitted complaints and demonstration cases. Select a record to inspect its narrative, history, and responder notes."
         action={
           <Button
             variant="outline"
@@ -2067,7 +2173,7 @@ function CasesPage({
           <p className="text-[11px] text-muted-foreground">
             Showing {filtered.length ? (page - 1) * pageSize + 1 : 0}–
             {Math.min(page * pageSize, filtered.length)} of {filtered.length}{" "}
-            fictional cases
+            cases
           </p>
           <div className="flex items-center gap-1">
             <Button
