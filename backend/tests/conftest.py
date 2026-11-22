@@ -15,13 +15,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.app.db.database import Base, get_db
-from backend.app.main import app
-from backend.app.models import Assessment, Case
-
+from app.db.database import Base, get_db
+from app.main import app
+from app.models import Assessment, Case, User
+from app.models.assessment_review import AssessmentReview
 
 @pytest.fixture
-def client():
+def db_session():
     test_engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -36,19 +36,44 @@ def client():
 
     Base.metadata.create_all(bind=test_engine)
 
+    db = TestingSessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=test_engine)
+        test_engine.dispose()
+
+@pytest.fixture
+def assessor_user(db_session):
+    user = User(
+        full_name="Test Assessor",
+        email="assessor@test.com",
+        hashed_password="test-hash",
+        role="assessor",
+        is_active=True,
+    )
+
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    return user
+
+
+@pytest.fixture
+def client(db_session, assessor_user):
     def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
+        yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
+    # Simulate an authenticated assessor for ordinary API tests.
+    from app.core.dependencies import get_current_user
+    app.dependency_overrides[get_current_user] = lambda: assessor_user
 
     try:
         with TestClient(app) as test_client:
             yield test_client
     finally:
         app.dependency_overrides.clear()
-        Base.metadata.drop_all(bind=test_engine)
-        test_engine.dispose()

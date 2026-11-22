@@ -1,8 +1,9 @@
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
 from app.services.ml_inference import predict_text
+from app.core.dependencies import require_roles
 
 
 router = APIRouter(
@@ -16,7 +17,10 @@ class MLPredictionRequest(BaseModel):
 
 
 @router.post("/predict")
-def predict(payload: MLPredictionRequest):
+def predict(
+    payload: MLPredictionRequest,
+    current_user=Depends(require_roles("admin", "assessor")),
+):
     try:
         return predict_text(payload.text)
 

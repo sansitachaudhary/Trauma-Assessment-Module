@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 
 if TYPE_CHECKING:
     from app.models.assessment import Assessment
@@ -18,6 +19,12 @@ class Case(Base):
         Integer,
         primary_key=True,
         index=True,
+    )
+
+    created_by: Mapped[int | None] = mapped_column(
+    ForeignKey("users.id", ondelete="RESTRICT"),
+    nullable=False,
+    index=True,
     )
 
     description: Mapped[str] = mapped_column(
@@ -47,3 +54,4 @@ class Case(Base):
         back_populates="case",
         cascade="all, delete-orphan",
     )
+creator = relationship("User")

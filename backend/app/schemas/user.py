@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -29,3 +30,20 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+# Admin schemas
+
+class AdminUserCreate(BaseModel):
+    full_name: str = Field(min_length=2, max_length=100)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    role: Literal["assessor", "reviewer"]
+
+
+class UserRoleUpdate(BaseModel):
+    role: Literal["assessor", "reviewer"]
+
+
+class UserStatusUpdate(BaseModel):
+    is_active: bool

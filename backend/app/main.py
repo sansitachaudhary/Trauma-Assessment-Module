@@ -8,7 +8,7 @@ from app.routers.complaints import router as complaints_router
 from app.routers.assessments import router as assessments_router
 from app.routers.auth import router as auth_router
 from app.routers.ml import router as ml_router
-
+from app.routers.admin import router as admin_router
 
 app = FastAPI(
     title="SAHYOG AI — Trauma Assessment Module API",
@@ -63,3 +63,4 @@ app.include_router(complaints_router)
 app.include_router(assessments_router)
 app.include_router(ml_router)
 app.include_router(auth_router)
+app.include_router(admin_router)
