@@ -66,3 +66,55 @@ def test_create_assessment_for_existing_case(client):
     assert "sleep_concern" in data["indicators"]
     assert data["safety_review_required"] is True
     assert data["review_status"] == "pending"
+
+
+def test_ml_prediction_endpoint_returns_prediction(client, monkeypatch):
+    from app.routers import ml as ml_router
+
+    expected = {
+        "predicted_label": 0,
+        "class_probabilities": {"0": 0.6, "1": 0.4},
+        "model_version": "test-model",
+        "research_only": True,
+        "clinical_use": False,
+        "label_meaning": "Test label meaning",
+    }
+
+    monkeypatch.setattr(ml_router, "predict_text", lambda text: expected)
+
+    response = client.post(
+        "/api/v1/ml/predict",
+        json={"text": "A fictional test transcript."},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected
+
+
+def test_ml_prediction_endpoint_rejects_whitespace(client):
+    response = client.post(
+        "/api/v1/ml/predict",
+        json={"text": "   "},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Text cannot be empty."
+
+
+def test_ml_prediction_endpoint_returns_503_when_model_missing(
+    client, monkeypatch
+):
+    from app.routers import ml as ml_router
+
+    def raise_model_missing(text):
+        raise FileNotFoundError
+
+    monkeypatch.setattr(ml_router, "predict_text", raise_model_missing)
+
+    response = client.post(
+        "/api/v1/ml/predict",
+        json={"text": "A fictional test transcript."},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "Experimental ML model is unavailable."

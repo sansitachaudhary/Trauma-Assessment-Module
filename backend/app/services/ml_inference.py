@@ -1,6 +1,6 @@
-from pathlib import Path
 import joblib
 from ml.config import ARTIFACTS_DIR
+from ml.preprocessing.clean_text import clean_text
 
 MODEL_PATH = ARTIFACTS_DIR / "text_classifier.joblib"
 
@@ -30,7 +30,7 @@ def predict_text(text: str) -> dict:
     This output is not a trauma or PTSD diagnosis and is not
     clinically validated.
     """
-    cleaned_text = " ".join(text.split())
+    cleaned_text = clean_text(text)
 
     if not cleaned_text:
         raise ValueError("Text cannot be empty.")

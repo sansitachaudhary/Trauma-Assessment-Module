@@ -3,6 +3,8 @@ from pathlib import Path
 
 import joblib
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
@@ -18,6 +20,7 @@ def train_model(
     label_column: str,
     output_path: str = "ml/artifacts/text_classifier.joblib",
     evaluation_output_dir: str = "ml/evaluation/results",
+    class_weight="balanced",
 ):
     """
     Train and evaluate a baseline text classifier.
@@ -65,7 +68,7 @@ def train_model(
             "classifier",
             LogisticRegression(
                 max_iter=1000,
-                class_weight="balanced",
+                class_weight=class_weight,
                 random_state=RANDOM_SEED,
             ),
         ),
@@ -76,6 +79,29 @@ def train_model(
 
     # Evaluate before refitting, so the holdout remains unseen during fit.
     y_pred = model.predict(X_test)
+
+    # Explore thresholds on the internal holdout only.
+    class_1_index = list(model.classes_).index(1)
+    y_prob = model.predict_proba(X_test)[:, class_1_index]
+
+    print("\nHoldout threshold comparison:")
+    for threshold in (0.40, 0.45, 0.50, 0.55, 0.60):
+        threshold_pred = (y_prob >= threshold).astype(int)
+
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            y_test,
+            threshold_pred,
+            labels=[1],
+            average=None,
+            zero_division=0,
+        )
+
+        print(
+            f"threshold={threshold:.2f} | "
+            f"class_1_precision={precision[0]:.4f} | "
+            f"class_1_recall={recall[0]:.4f} | "
+            f"class_1_f1={f1[0]:.4f}"
+        )
 
     metrics = evaluate_classifier(
         y_true=y_test.tolist(),
@@ -110,7 +136,15 @@ def train_model(
 
 
 if __name__ == "__main__":
-    print(
-        "Training module ready. Run training only after verifying "
-        "the authorized dataset and its label definitions."
+    from ml.config import PROCESSED_DATA_DIR
+
+    dataset_path = PROCESSED_DATA_DIR / "train_prepared.csv"
+
+    result = train_model(
+        dataset_path=str(dataset_path),
+        text_column="text",
+        label_column="label",
     )
+
+    print("Training completed.")
+    print(result)
