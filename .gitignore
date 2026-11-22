@@ -48,3 +48,9 @@ venv/
 .env
 .env.*
 !.env.example
+
+# DAIC-WOZ dataset - do not commit
+backend/dataset/
+
+# Local PostgreSQL backups - never commit
+db_backups/

@@ -8,3 +8,6 @@ pandas
 pytest
 scikit-learn
 matplotlib
+pwdlib[argon2]
+PyJWT
+email-validator

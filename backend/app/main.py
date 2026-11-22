@@ -1,23 +1,13 @@
 
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.db.database import Base, engine
-from app.models.assessment import Assessment
-from app.models.case import Case
+from app.db.database import engine
 from app.routers.complaints import router as complaints_router
 from app.routers.assessments import router as assessments_router
+from app.routers.auth import router as auth_router
 from app.routers.ml import router as ml_router
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Register the models and initialize tables for local development.
-    Base.metadata.create_all(bind=engine)
-    yield
 
 
 app = FastAPI(
@@ -27,10 +17,8 @@ app = FastAPI(
         "and human-reviewed support workflows."
     ),
     version="0.2.0",
-    lifespan=lifespan,
 )
 
-# Local development only. Restrict origins further for production.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -66,12 +54,12 @@ def database_health_check():
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
-
         return {"status": "ok", "database": "connected"}
     except Exception:
         return {"status": "error", "database": "unavailable"}
-        
+
 
 app.include_router(complaints_router)
 app.include_router(assessments_router)
 app.include_router(ml_router)
+app.include_router(auth_router)

@@ -1,15 +1,21 @@
 
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
 
 class Settings(BaseSettings):
     app_name: str = "Trauma Assessment Module API"
-    database_url: str = f"sqlite:///{BACKEND_DIR / 'sahyog.db'}"
+    database_url: str
+
+    jwt_secret: str
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
     model_config = SettingsConfigDict(
-        env_file=(BACKEND_DIR / ".env", ".env"),
+        env_file=PROJECT_ROOT / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
