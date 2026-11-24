@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import "./dashboard.css";
 import { useEffect, useState } from "react";
+import { getCurrentUser, logout } from "../lib/auth-api";
+import type { CurrentUser } from "../lib/auth-api";
 import {
   Bell,
   CheckCircle2,
@@ -71,6 +73,18 @@ function SahyogApp() {
   const [assessment, setAssessment] = useState<AssessmentOutcome | null>(null);
   const [assessmentNarrative, setAssessmentNarrative] = useState("");
   const [toast, setToast] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+
+useEffect(() => {
+  getCurrentUser()
+    .then((user) => {
+      setCurrentUser(user);
+    })
+    .catch((error) => {
+      console.error("Failed to load user profile:", error);
+    });
+  }, []); 
 
   useEffect(() => {
     let active = true;
@@ -234,26 +248,71 @@ function SahyogApp() {
         <div
           className={`mt-auto border-t border-sidebar-foreground/10 p-4 ${desktopCollapsed ? "px-3" : ""}`}
         >
-          <div className="flex items-center gap-3 rounded-md bg-sidebar-foreground/5 px-3 py-3">
-            <div
-              className="grid size-9 shrink-0 place-items-center rounded-md bg-sidebar-foreground/10 text-xs font-semibold"
-              title="Responder"
-            >
-              R
-            </div>
-            {!desktopCollapsed && (
-              <>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">Responder</p>
-                  <p className="mt-0.5 text-xs text-sidebar-foreground/60">
-                    Support workspace
-                  </p>
-                </div>
-                <ChevronDown className="size-4 shrink-0 text-sidebar-foreground/50" />
-              </>
-            )}
-          </div>
+          
+<div className="relative">
+  <button
+    type="button"
+    onClick={() => setUserMenuOpen(!userMenuOpen)}
+    className="flex w-full items-center gap-3 rounded-md bg-sidebar-foreground/5 px-3 py-3 text-left hover:bg-sidebar-foreground/10"
+    aria-expanded={userMenuOpen}
+  >
+    <div
+      className="grid size-9 shrink-0 place-items-center rounded-md bg-sidebar-foreground/10 text-xs font-semibold"
+      title={currentUser?.full_name || "User"}
+    >
+      {(currentUser?.full_name || "U").charAt(0).toUpperCase()}
+    </div>
+
+    {!desktopCollapsed && (
+      <>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">
+            {currentUser?.full_name || "Loading user..."}
+          </p>
+          <p className="mt-0.5 text-xs text-sidebar-foreground/60">
+            {currentUser?.role || "Loading role..."}
+          </p>
         </div>
+
+        <ChevronDown
+          className={`size-4 shrink-0 transition-transform ${
+            userMenuOpen ? "rotate-180" : ""
+          }`}
+        />
+      </>
+    )}
+  </button>
+
+  {userMenuOpen && (
+    <div className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-lg border border-sidebar-foreground/15 bg-[#17394a] p-3 shadow-xl">
+      <p className="mb-2 text-sm font-semibold">My Profile</p>
+
+      <p className="break-all text-xs text-sidebar-foreground/70">
+        {currentUser?.email}
+      </p>
+
+      <p className="mt-1 text-xs capitalize text-sidebar-foreground/70">
+        Role: {currentUser?.role}
+      </p>
+
+      <div className="my-3 border-t border-sidebar-foreground/15" />
+
+      <button
+        type="button"
+        onClick={() => {
+          logout();
+          window.location.href = "/login";
+        }}
+        className="w-full rounded-md px-2 py-2 text-left text-sm text-red-300 hover:bg-sidebar-foreground/10"
+      >
+        Log out
+      </button>
+    </div>
+  )}
+</div>
+</div>
+
+            
       </aside>
 
       <main
