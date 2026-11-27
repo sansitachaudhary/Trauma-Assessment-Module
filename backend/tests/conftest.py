@@ -17,13 +17,11 @@ from sqlalchemy.pool import StaticPool
 
 from app.db.database import Base, get_db
 from app.main import app
-<<<<<<< Updated upstream
+
 from app.models import Assessment, Case, User
 from app.models.assessment_review import AssessmentReview
-=======
-from app.models import Assessment, Case
 
->>>>>>> Stashed changes
+
 
 @pytest.fixture
 def db_session():

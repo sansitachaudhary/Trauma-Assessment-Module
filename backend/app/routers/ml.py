@@ -17,16 +17,14 @@ class MLPredictionRequest(BaseModel):
     text: str = Field(min_length=1, max_length=20000)
 
 
-<<<<<<< Updated upstream
+
 @router.post("/predict")
+@router.post("/predict", response_model=MLPredictionResponse)
 def predict(
     payload: MLPredictionRequest,
     current_user=Depends(require_roles("admin", "assessor")),
 ):
-=======
-@router.post("/predict", response_model=MLPredictionResponse)
-def predict(payload: MLPredictionRequest):
->>>>>>> Stashed changes
+
     try:
         return predict_text(payload.text)
 
