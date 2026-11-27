@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import "./dashboard.css";
 <<<<<<< Updated upstream
 import { useEffect, useState } from "react";
-import { getCurrentUser, logout } from "../lib/auth-api";
+import { getCurrentUser, getToken, logout } from "../lib/auth-api";
 import type { CurrentUser } from "../lib/auth-api";
 =======
 import { useCallback, useEffect, useState } from "react";
@@ -35,6 +35,7 @@ import {
   BrandBlock,
   NavItem,
   navigation,
+  getNavigationForRole,
   type View,
 } from "@/components/sahyog/shared";
 import { OverviewPage } from "@/pages/sahyog/OverviewPage";
@@ -46,7 +47,22 @@ import { ReportsPage } from "@/pages/sahyog/ReportsPage";
 import { SettingsPage } from "@/pages/sahyog/SettingsPage";
 
 export const Route = createFileRoute("/dashboard")({
+  beforeLoad: async () => {
+    if (!getToken()) {
+      throw redirect({ to: "/login" });
+    }
+
+    try {
+      await getCurrentUser();
+    } catch {
+      logout();
+      throw redirect({ to: "/login" });
+    }
+  },
+
   head: () => ({
+   
+    
     meta: [
       { title: "SAHYOG AI — Distress Assessment & Human Support" },
       {
@@ -83,6 +99,7 @@ function SahyogApp() {
   const [toast, setToast] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const roleNavigation = getNavigationForRole(currentUser?.role);
 
 useEffect(() => {
   getCurrentUser()
@@ -217,8 +234,8 @@ useEffect(() => {
             </p>
           )}
           <nav className="mt-3 space-y-1" aria-label="Main navigation">
-            {navigation
-              .filter((item) => item.group === "WORKSPACE")
+            {roleNavigation
+  .filter((item) => item.group === "WORKSPACE")
               .map((item) => (
                 <NavItem
                   key={item.label}
@@ -236,8 +253,8 @@ useEffect(() => {
             </p>
           )}
           <nav className="space-y-1" aria-label="Administration navigation">
-            {navigation
-              .filter((item) => item.group === "ADMINISTRATION")
+            {roleNavigation
+  .filter((item) => item.group === "ADMINISTRATION")
               .map((item) => (
                 <NavItem
                   key={item.label}
@@ -345,7 +362,7 @@ useEffect(() => {
           {mobileNav && (
             <div className="border-t border-border bg-background px-4 py-3 lg:hidden">
               <nav className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-                {navigation.map((item) => (
+                {roleNavigation.map((item) => (
                   <NavItem
                     key={item.label}
                     item={item}

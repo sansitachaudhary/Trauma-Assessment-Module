@@ -13,6 +13,7 @@ from app.schemas.assessment import (
     AssessmentCreate,
     AssessmentResponse,
     AssessmentReview,
+    PendingAssessmentResponse,
 )
 router = APIRouter(prefix="/api/v1/assessments", tags=["Assessments"])
 
@@ -57,7 +58,39 @@ def create_assessment(
 
     return assessment
 
+# New endpoint
+@router.get("/pending", response_model=list[PendingAssessmentResponse])
+def get_pending_assessments(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_roles("admin", "reviewer")),
+):
+    assessments = (
+        db.query(Assessment)
+        .join(Case)
+        .filter(Assessment.review_status == "pending")
+        .order_by(Assessment.created_at.desc())
+        .all()
+    )
 
+    return [
+        {
+            "id": assessment.id,
+            "case_id": assessment.case_id,
+            "svi": assessment.svi,
+            "indicators": assessment.indicators,
+            "safety_review_required": assessment.safety_review_required,
+            "review_status": assessment.review_status,
+            "model_version": assessment.model_version,
+            "created_at": assessment.created_at,
+            "case_description": assessment.case.description,
+            "case_language": assessment.case.language,
+            "case_created_at": assessment.case.created_at,
+        }
+        for assessment in assessments
+    ]
+
+
+# Your existing endpoint stays unchanged
 @router.get("/{assessment_id}", response_model=AssessmentResponse)
 def get_assessment(
     assessment_id: int,

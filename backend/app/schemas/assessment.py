@@ -34,3 +34,8 @@ class AssessmentReviewResponse(BaseModel):
     reviewer_id: int
     review_status: str
     reviewed_at: datetime
+
+class PendingAssessmentResponse(AssessmentResponse):
+    case_description: str
+    case_language: str
+    case_created_at: datetime

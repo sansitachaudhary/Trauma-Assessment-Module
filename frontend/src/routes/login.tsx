@@ -96,15 +96,29 @@ function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[#637b87]">
-          New assessor?{" "}
-          <Link
-            to="/"
-            className="font-semibold text-[#147f78] hover:underline"
-          >
-            Return to homepage
-          </Link>
-        </p>
+        
+<div className="mt-6 space-y-3 text-center text-sm text-[#637b87]">
+  <p>
+    Don't have an account?{" "}
+    <Link
+      to="/register"
+      className="font-semibold text-[#147f78] hover:underline"
+    >
+      Create an account
+    </Link>
+  </p>
+
+  <p>
+    New assessor?{" "}
+    <Link
+      to="/"
+      className="font-semibold text-[#147f78] hover:underline"
+    >
+      Return to homepage
+    </Link>
+  </p>
+</div>
+
       </div>
     </main>
   );

@@ -163,7 +163,7 @@ function HomePage() {
           <a href="#trust">Trust &amp; safety</a>
         </nav>
 
-        <Link to="/dashboard" className="sh-header-cta">
+        <Link to="/login" className="sh-header-cta">
           Responder portal <ArrowUpRight size={17} />
         </Link>
       </header>
@@ -188,7 +188,7 @@ function HomePage() {
             </p>
 
             <div className="sh-hero-actions">
-              <Link to="/dashboard" className="sh-button sh-button-primary">
+              <Link to="/login" className="sh-button sh-button-primary">
                 Open responder workspace <ArrowRight size={18} />
               </Link>
               <a href="#approach" className="sh-text-link">
@@ -423,7 +423,7 @@ function HomePage() {
                 keeps trained responders in control.
               </p>
             </div>
-            <Link to="/dashboard" className="sh-solution-link">
+            <Link to="/login" className="sh-solution-link">
               Explore workspace <ArrowRight size={18} />
             </Link>
           </div>
@@ -521,7 +521,7 @@ function HomePage() {
               AI brings together a set of workflow areas intended to make
               information and follow-up easier to navigate.
             </p>
-            <Link to="/dashboard" className="sh-button sh-button-primary">
+            <Link to="/login" className="sh-button sh-button-primary">
               Explore the workspace <ArrowRight size={18} />
             </Link>
             <div className="sh-capabilities-note">
@@ -577,7 +577,7 @@ function HomePage() {
                 responders organise information and keep their attention on
                 the person, their circumstances, and appropriate next steps.
               </p>
-              <Link to="/dashboard" className="sh-button sh-button-light">
+              <Link to="/login" className="sh-button sh-button-light">
                 Enter the workspace <ArrowRight size={18} />
               </Link>
               <div className="sh-workflow-caption">
@@ -758,7 +758,7 @@ function HomePage() {
             helping. Thoughtful listening, human judgement, and dignity
             remain at the heart of the process.
           </p>
-          <Link to="/dashboard" className="sh-button sh-button-primary">
+          <Link to="/login" className="sh-button sh-button-primary">
             Open responder workspace <ArrowRight size={18} />
           </Link>
           <div className="sh-closing-footnote">

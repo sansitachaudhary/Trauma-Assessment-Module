@@ -3,6 +3,7 @@ import {
   Activity,
   BookOpen,
   BriefcaseBusiness,
+   ClipboardCheck,
   FileChartColumnIncreasing,
   FilePlus2,
   HeartHandshake,
@@ -26,26 +27,58 @@ export type View =
   | "New Assessment"
   | "Case Management"
   | "Referrals"
+  | "Review Queue"
   | "Reports"
   | "Settings"
   | "Case detail";
 
-export const navigation: {
+
+export type UserRole = "admin" | "assessor" | "reviewer";
+
+type NavigationItem = {
   label: Exclude<View, "Case detail">;
   icon: typeof Home;
   group: "WORKSPACE" | "ADMINISTRATION";
-}[] = [
+};
+
+const assessorNavigation: NavigationItem[] = [
   { label: "Overview", icon: Home, group: "WORKSPACE" },
   { label: "New Assessment", icon: FilePlus2, group: "WORKSPACE" },
   { label: "Case Management", icon: BriefcaseBusiness, group: "WORKSPACE" },
   { label: "Referrals", icon: HeartHandshake, group: "WORKSPACE" },
-  {
-    label: "Reports",
-    icon: FileChartColumnIncreasing,
-    group: "ADMINISTRATION",
-  },
+  { label: "Reports", icon: FileChartColumnIncreasing, group: "ADMINISTRATION" },
   { label: "Settings", icon: Settings2, group: "ADMINISTRATION" },
 ];
+
+const reviewerNavigation: NavigationItem[] = [
+  { label: "Overview", icon: Home, group: "WORKSPACE" },
+  { label: "Review Queue", icon: ClipboardCheck, group: "WORKSPACE" },
+  { label: "Case Management", icon: BriefcaseBusiness, group: "WORKSPACE" },
+  { label: "Reports", icon: FileChartColumnIncreasing, group: "ADMINISTRATION" },
+  { label: "Settings", icon: Settings2, group: "ADMINISTRATION" },
+];
+
+const adminNavigation: NavigationItem[] = [
+  { label: "Overview", icon: Home, group: "WORKSPACE" },
+  { label: "Case Management", icon: BriefcaseBusiness, group: "WORKSPACE" },
+  { label: "Reports", icon: FileChartColumnIncreasing, group: "ADMINISTRATION" },
+  { label: "Settings", icon: Settings2, group: "ADMINISTRATION" },
+];
+
+export function getNavigationForRole(role?: string): NavigationItem[] {
+  switch (role?.toLowerCase()) {
+    case "assessor":
+      return assessorNavigation;
+    case "reviewer":
+      return reviewerNavigation;
+    case "admin":
+      return adminNavigation;
+    default:
+      return [];
+  }
+}
+// Temporary default navigation for existing dashboard compatibility
+export const navigation: NavigationItem[] = assessorNavigation;
 
 export const referralCategoryIcons: Record<
   ReferralCategory,
