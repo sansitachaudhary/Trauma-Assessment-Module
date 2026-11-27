@@ -41,23 +41,6 @@ def evaluate_dev_model(
     y_true = df["label"].tolist()
     y_pred = model.predict(X).tolist()
 
-    print("\nMisclassified participants and class-1 probabilities:")
-    class_1_index = list(model.classes_).index(1)
-    probabilities = model.predict_proba(X)
-
-    for participant_id, true_label, predicted_label, probability in zip(
-        df["Participant_ID"],
-        y_true,
-        y_pred,
-        probabilities[:, class_1_index],
-    ):
-        if true_label != predicted_label:
-            print(
-                f"Participant {participant_id}: "
-                f"true={true_label}, predicted={predicted_label}, "
-                f"class_1_probability={probability:.4f}"
-            )
-
     results = evaluate_classifier(
         y_true=y_true,
         y_pred=y_pred,
@@ -67,7 +50,6 @@ def evaluate_dev_model(
 
     print("Evaluation split: official DAIC-WOZ development")
     print("Development participants evaluated:", len(df))
-    print("Participant IDs:", sorted(df["Participant_ID"].tolist()))
     print("Label distribution:")
     print(df["label"].value_counts().sort_index().to_string())
     print("\nMetrics:")

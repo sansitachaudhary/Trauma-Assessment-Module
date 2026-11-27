@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, Integer, JSON, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
@@ -41,6 +41,48 @@ class Case(Base):
     status: Mapped[str] = mapped_column(
         String(30),
         default="pending_review",
+        nullable=False,
+    )
+
+    assigned: Mapped[str] = mapped_column(
+        String(255),
+        default="Unassigned",
+        server_default="Unassigned",
+        nullable=False,
+    )
+
+    notes: Mapped[str] = mapped_column(
+        Text,
+        default="",
+        server_default=text("''"),
+        nullable=False,
+    )
+
+    rule_based_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        nullable=False,
+    )
+
+    rule_based_priority: Mapped[str] = mapped_column(
+        String(30),
+        default="Low",
+        server_default="Low",
+        nullable=False,
+    )
+
+    rule_based_indicators: Mapped[list[dict]] = mapped_column(
+        JSON,
+        default=list,
+        server_default=text("'[]'"),
+        nullable=False,
+    )
+
+    history: Mapped[list[str]] = mapped_column(
+        JSON,
+        default=list,
+        server_default=text("'[]'"),
         nullable=False,
     )
 

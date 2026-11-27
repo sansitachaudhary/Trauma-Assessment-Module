@@ -28,7 +28,11 @@ import {
   type DemoCase,
   type ScoreSettings,
 } from "@/lib/demo-data";
-import { PageIntro, SectionHeading, type View } from "@/components/sahyog/shared";
+import {
+  PageIntro,
+  SectionHeading,
+  type View,
+} from "@/components/sahyog/shared";
 import { AssessmentResultPage } from "./AssessmentResultPage";
 
 export interface AssessmentPageProps {
@@ -129,7 +133,9 @@ export function AssessmentPage({
     recognition.onerror = (event: any) => {
       setIsListening(false);
       if (event.error !== "no-speech") {
-        setError(`Microphone error (${event.error}). You can continue by typing your narrative.`);
+        setError(
+          `Microphone error (${event.error}). You can continue by typing your narrative.`,
+        );
       }
     };
 
@@ -141,7 +147,9 @@ export function AssessmentPage({
       recognition.start();
     } catch {
       setIsListening(false);
-      setError("Unable to initialize microphone. Please check browser microphone permissions.");
+      setError(
+        "Unable to initialize microphone. Please check browser microphone permissions.",
+      );
     }
   };
 
@@ -164,12 +172,16 @@ export function AssessmentPage({
     event.preventDefault();
 
     if (sourceText.trim().length < 12) {
-      setError("Please enter at least 12 characters to run an illustrative assessment.");
+      setError(
+        "Please enter at least 12 characters to run an illustrative assessment.",
+      );
       return;
     }
 
     if (!consent) {
-      setError("Please confirm human oversight acknowledgement before submitting.");
+      setError(
+        "Please confirm human oversight acknowledgement before submitting.",
+      );
       return;
     }
 
@@ -179,10 +191,17 @@ export function AssessmentPage({
     setCreatedId(null);
 
     try {
+      const mock = assessDemonstration(sourceText, settings);
+
       // 1. Persist complaint via FastAPI backend
       const savedComplaint = await createComplaint({
         description: sourceText,
         language,
+        notes:
+          "Intake registered via dashboard. Mandatory responder review pending.",
+        rule_based_score: mock.score,
+        rule_based_priority: mock.priority,
+        rule_based_indicators: mock.indicators,
       });
 
       // 2. Predict with experimental ML model
@@ -190,19 +209,21 @@ export function AssessmentPage({
       try {
         prediction = await predictWithML(sourceText);
         setMlResult(prediction);
-      } catch (mlErr) {
-        console.warn("ML model prediction error (non-fatal):", mlErr);
+      } catch {
+        console.warn("ML model prediction was unavailable.");
       }
 
       // 3. Rule-based SVI assessment
-      const mock = assessDemonstration(sourceText, settings);
       const id = `DB-${savedComplaint.id}`;
 
-      const date = new Date(savedComplaint.created_at).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
+      const date = new Date(savedComplaint.created_at).toLocaleDateString(
+        "en-GB",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        },
+      );
 
       const created: DemoCase = {
         id,
@@ -214,18 +235,16 @@ export function AssessmentPage({
               ? "Hindi"
               : savedComplaint.language,
         status: "Pending review",
-        assigned: "Unassigned",
-        score: mock.score,
-        priority: mock.priority,
+        assigned: savedComplaint.assigned,
+        score: savedComplaint.rule_based_score,
+        priority: savedComplaint.rule_based_priority,
         summary:
           sourceText.slice(0, 110) + (sourceText.length > 110 ? "…" : ""),
-        narrative: sourceText,
-        indicators: mock.indicators,
-        notes: "Intake registered via dashboard. Mandatory responder review pending.",
+        narrative: savedComplaint.description,
+        indicators: savedComplaint.rule_based_indicators,
+        notes: savedComplaint.notes,
         followUpDate: "",
-        history: [
-          `${date} · Recorded in helpline intake · Human review required`,
-        ],
+        history: savedComplaint.history,
       };
 
       onSubmitCase(created);
@@ -233,7 +252,7 @@ export function AssessmentPage({
       setCreatedId(id);
       onNotify(`Complaint ${id} registered successfully.`);
     } catch (err) {
-      console.error("Failed to save complaint:", err);
+      console.error("Failed to save complaint.");
       setError(
         err instanceof Error
           ? err.message
@@ -272,7 +291,10 @@ export function AssessmentPage({
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="language-select" className="block text-xs font-semibold text-foreground">
+                <label
+                  htmlFor="language-select"
+                  className="block text-xs font-semibold text-foreground"
+                >
                   Intake Language <span className="text-status-urgent">*</span>
                 </label>
                 <select
@@ -291,7 +313,11 @@ export function AssessmentPage({
                 <label className="block text-xs font-semibold text-foreground">
                   Input Mode
                 </label>
-                <div className="mt-1.5 grid h-10 grid-cols-2 gap-1 rounded-lg border border-input bg-muted/30 p-1" role="radiogroup" aria-label="Input mode">
+                <div
+                  className="mt-1.5 grid h-10 grid-cols-2 gap-1 rounded-lg border border-input bg-muted/30 p-1"
+                  role="radiogroup"
+                  aria-label="Input mode"
+                >
                   <button
                     type="button"
                     role="radio"
@@ -370,7 +396,8 @@ export function AssessmentPage({
                 minLength={12}
               />
               <p className="mt-1.5 text-[11px] text-muted-foreground">
-                A minimum of 12 characters is required to generate screening indicators.
+                A minimum of 12 characters is required to generate screening
+                indicators.
               </p>
             </div>
           </div>
@@ -387,7 +414,11 @@ export function AssessmentPage({
                   }`}
                   aria-hidden="true"
                 >
-                  {isListening ? <Mic className="size-5" /> : <Activity className="size-5" />}
+                  {isListening ? (
+                    <Mic className="size-5" />
+                  ) : (
+                    <Activity className="size-5" />
+                  )}
                 </div>
 
                 <div>
@@ -395,7 +426,8 @@ export function AssessmentPage({
                     Voice Dictation Assistant
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    Dictate caller statements in real-time. Speech is transcribed directly in-browser.
+                    Dictate caller statements in real-time. Speech is
+                    transcribed directly in-browser.
                   </p>
                 </div>
               </div>
@@ -443,7 +475,10 @@ export function AssessmentPage({
                 role="status"
                 className="mt-3 flex items-center gap-2 rounded-lg border border-status-urgent/30 bg-status-urgent/10 px-3 py-2 text-xs font-semibold text-status-urgent"
               >
-                <span className="size-2 rounded-full bg-status-urgent animate-ping" aria-hidden="true" />
+                <span
+                  className="size-2 rounded-full bg-status-urgent animate-ping"
+                  aria-hidden="true"
+                />
                 Listening actively... Speak clearly into your microphone.
               </div>
             )}
@@ -466,7 +501,13 @@ export function AssessmentPage({
                 }}
               />
               <span className="text-xs leading-relaxed text-muted-foreground">
-                <strong className="text-foreground">Human Responder Oversight Acknowledged:</strong> I confirm that this assessment output is a preliminary decision-support indicator only. All care decisions and emergency referrals remain the sole responsibility of trained human personnel under NHAAS 14566 protocols.
+                <strong className="text-foreground">
+                  Human Responder Oversight Acknowledged:
+                </strong>{" "}
+                I confirm that this assessment output is a preliminary
+                decision-support indicator only. All care decisions and
+                emergency referrals remain the sole responsibility of trained
+                human personnel under NHAAS 14566 protocols.
               </span>
             </label>
           </div>
@@ -477,7 +518,10 @@ export function AssessmentPage({
               role="alert"
               className="flex items-start gap-2.5 rounded-lg border border-status-urgent/30 bg-status-urgent/10 p-3 text-xs text-status-urgent"
             >
-              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <AlertCircle
+                className="mt-0.5 size-4 shrink-0"
+                aria-hidden="true"
+              />
               <span>{error}</span>
             </div>
           )}
@@ -538,7 +582,10 @@ export function AssessmentPage({
                       {scenario.narrative}
                     </p>
                   </div>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <ChevronRight
+                    className="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </button>
               ))}
             </div>
@@ -556,17 +603,36 @@ export function AssessmentPage({
             <div className="space-y-3 p-4 text-xs">
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { key: "fear", label: "Expressed Fear", desc: "Panic, terrifying phrases" },
-                  { key: "duration", label: "Prolonged Distress", desc: "Months, insomnia, flashbacks" },
-                  { key: "safety", label: "Stated Safety Concern", desc: "Threats, stalker, physical danger" },
-                  { key: "overwhelm", label: "Emotional Overwhelm", desc: "Hopelessness, isolation" },
+                  {
+                    key: "fear",
+                    label: "Expressed Fear",
+                    desc: "Panic, terrifying phrases",
+                  },
+                  {
+                    key: "duration",
+                    label: "Prolonged Distress",
+                    desc: "Months, insomnia, flashbacks",
+                  },
+                  {
+                    key: "safety",
+                    label: "Stated Safety Concern",
+                    desc: "Threats, stalker, physical danger",
+                  },
+                  {
+                    key: "overwhelm",
+                    label: "Emotional Overwhelm",
+                    desc: "Hopelessness, isolation",
+                  },
                 ].map((item) => (
                   <div
                     key={item.key}
                     className="rounded-lg border border-border bg-muted/20 p-2.5 text-[11px]"
                   >
                     <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+                      <span
+                        className="size-1.5 rounded-full bg-primary"
+                        aria-hidden="true"
+                      />
                       <span>{item.label}</span>
                     </div>
                     <p className="mt-1 text-[10px] text-muted-foreground">
@@ -577,8 +643,11 @@ export function AssessmentPage({
               </div>
 
               <div className="rounded-lg border border-border/80 bg-muted/10 p-3 text-[11px] leading-relaxed text-muted-foreground">
-                <span className="font-semibold text-foreground">Safety Notice: </span>
-                Absence of keywords does not equate to absence of harm. Responders must always probe contextually.
+                <span className="font-semibold text-foreground">
+                  Safety Notice:{" "}
+                </span>
+                Absence of keywords does not equate to absence of harm.
+                Responders must always probe contextually.
               </div>
             </div>
           </section>
@@ -594,24 +663,34 @@ export function AssessmentPage({
           <div className="border-b border-primary/20 bg-primary/5 px-5 py-4 sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <BrainCircuit className="size-5 text-primary" aria-hidden="true" />
+                <BrainCircuit
+                  className="size-5 text-primary"
+                  aria-hidden="true"
+                />
                 <h3 className="text-base font-bold text-foreground">
-                  Experimental ML Screening Output (DAIC-WOZ)
+                  Experimental ML Prediction (DAIC-WOZ PHQ8_Binary)
                 </h3>
               </div>
-              <Badge variant="outline" className="border-primary/30 bg-primary/10 text-xs font-semibold text-primary">
+              <Badge
+                variant="outline"
+                className="border-primary/30 bg-primary/10 text-xs font-semibold text-primary"
+              >
                 Model: {mlResult.model_version}
               </Badge>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Deep-learning distress prediction pipeline trained on research depression/distress transcripts.
+              TF-IDF and Logistic Regression research model. Its output is a
+              DAIC-WOZ PHQ8_Binary depression-screening label, not a trauma or
+              PTSD diagnosis.
             </p>
           </div>
 
           <div className="p-5 sm:p-6">
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-xl border border-border bg-muted/20 p-4">
-                <p className="text-xs font-semibold text-muted-foreground">Predicted Classification</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Predicted Classification
+                </p>
                 <p className="mt-2 text-2xl font-black text-foreground">
                   {mlResult.predicted_label}
                 </p>
@@ -621,41 +700,56 @@ export function AssessmentPage({
               </div>
 
               <div className="rounded-xl border border-border bg-muted/20 p-4">
-                <p className="text-xs font-semibold text-muted-foreground">Class 0 Probability (Low/Normal)</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Class 0 Probability (PHQ8_Binary = 0)
+                </p>
                 <p className="mt-2 text-2xl font-black text-foreground">
                   {((mlResult.class_probabilities["0"] ?? 0) * 100).toFixed(1)}%
                 </p>
                 <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-status-low"
-                    style={{ width: `${(mlResult.class_probabilities["0"] ?? 0) * 100}%` }}
+                    style={{
+                      width: `${(mlResult.class_probabilities["0"] ?? 0) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
 
               <div className="rounded-xl border border-border bg-muted/20 p-4">
-                <p className="text-xs font-semibold text-muted-foreground">Class 1 Probability (Distress Indicator)</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Class 1 Probability (PHQ8_Binary = 1)
+                </p>
                 <p className="mt-2 text-2xl font-black text-foreground">
                   {((mlResult.class_probabilities["1"] ?? 0) * 100).toFixed(1)}%
                 </p>
                 <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-status-urgent"
-                    style={{ width: `${(mlResult.class_probabilities["1"] ?? 0) * 100}%` }}
+                    style={{
+                      width: `${(mlResult.class_probabilities["1"] ?? 0) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
             </div>
 
             <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-300/40 bg-amber-500/10 p-3.5 text-xs text-foreground">
-              <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber-600" aria-hidden="true" />
+              <ShieldAlert
+                className="mt-0.5 size-4 shrink-0 text-amber-600"
+                aria-hidden="true"
+              />
               <div>
                 <strong className="font-bold text-amber-900 dark:text-amber-200">
                   Research Evaluation Only:{" "}
                 </strong>
-                <span className="text-muted-foreground">{mlResult.label_meaning}. </span>
                 <span className="text-muted-foreground">
-                  This experimental model is not clinically certified and must not be used as an autonomous diagnosis of PTSD or psychological trauma. Human evaluation is mandatory.
+                  {mlResult.label_meaning}.{" "}
+                </span>
+                <span className="text-muted-foreground">
+                  This experimental model is not clinically certified and must
+                  not be used as an autonomous diagnosis of PTSD or
+                  psychological trauma. Human evaluation is mandatory.
                 </span>
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 const API_BASE_URL = "http://127.0.0.1:8000";
 
 export interface MLPredictionResponse {
@@ -22,10 +21,7 @@ export async function predictWithML(
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    throw new Error(
-      error?.detail || `ML prediction failed (${response.status})`,
-    );
+    throw new Error(`ML prediction failed (${response.status})`);
   }
 
   return response.json();

@@ -17,11 +17,20 @@ describe("getCaseDescription", () => {
     ).toBe("No description provided yet.");
   });
 
-  it("preserves a real description", () => {
+  it("prefers the complete narrative over a short summary", () => {
     expect(
       getCaseDescription({
         summary: "A real summary",
         narrative: "The complete description.",
+      }),
+    ).toBe("The complete description.");
+  });
+
+  it("uses a summary when no narrative is available", () => {
+    expect(
+      getCaseDescription({
+        summary: "A real summary",
+        narrative: "",
       }),
     ).toBe("A real summary");
   });

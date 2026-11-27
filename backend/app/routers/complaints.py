@@ -1,13 +1,19 @@
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.models.case import Case
+<<<<<<< Updated upstream
 from app.schemas.case import CaseCreate, CaseResponse
 from app.core.dependencies import require_roles
 from sqlalchemy import select, and_
+=======
+from app.schemas.case import CaseCreate, CaseResponse, CaseUpdate
+>>>>>>> Stashed changes
 
 router = APIRouter(prefix="/api/v1/complaints", tags=["Complaints"])
 
@@ -23,10 +29,26 @@ def create_complaint(
     current_user=Depends(require_roles("admin", "assessor")),
 ):
     case = Case(
+<<<<<<< Updated upstream
     description=payload.description,
     language=payload.language,
     created_by=current_user.id,
 )
+=======
+        description=payload.description,
+        language=payload.language,
+        notes=payload.notes,
+        rule_based_score=payload.rule_based_score,
+        rule_based_priority=payload.rule_based_priority,
+        rule_based_indicators=[
+            indicator.model_dump()
+            for indicator in payload.rule_based_indicators
+        ],
+        history=[
+            f"{datetime.now(timezone.utc).strftime('%d %b %Y')} · Complaint submitted via API"
+        ],
+    )
+>>>>>>> Stashed changes
 
     db.add(case)
     db.commit()
@@ -67,4 +89,50 @@ def get_complaint(
             detail="Case not found",
         )
 
+<<<<<<< Updated upstream
     return case
+=======
+    return case
+
+
+@router.patch("/{case_id}", response_model=CaseResponse)
+def update_complaint(
+    case_id: int,
+    payload: CaseUpdate,
+    db: Session = Depends(get_db),
+):
+    case = db.get(Case, case_id)
+
+    if case is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Case not found",
+        )
+
+    changes = payload.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+        exclude={"history_message"},
+    )
+    if not changes and payload.history_message is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="At least one case field or history message is required",
+        )
+
+    for field, value in changes.items():
+        if field == "rule_based_indicators":
+            value = [indicator.model_dump() for indicator in value]
+        setattr(case, field, value)
+
+    if payload.history_message is not None:
+        event = (
+            f"{datetime.now(timezone.utc).strftime('%d %b %Y')} · "
+            f"{payload.history_message}"
+        )
+        case.history = [event, *case.history]
+
+    db.commit()
+    db.refresh(case)
+    return case
+>>>>>>> Stashed changes

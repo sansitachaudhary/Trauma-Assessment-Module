@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import "./dashboard.css";
+<<<<<<< Updated upstream
 import { useEffect, useState } from "react";
 import { getCurrentUser, logout } from "../lib/auth-api";
 import type { CurrentUser } from "../lib/auth-api";
+=======
+import { useCallback, useEffect, useState } from "react";
+>>>>>>> Stashed changes
 import {
   Bell,
   CheckCircle2,
@@ -13,7 +17,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getComplaints } from "../lib/complaint-api";
+import {
+  getComplaints,
+  mergeSavedCases,
+  updateComplaint,
+} from "../lib/complaint-api";
 import type { AssessmentOutcome } from "@/lib/assessment-service";
 import {
   defaultScoreSettings,
@@ -86,73 +94,35 @@ useEffect(() => {
     });
   }, []); 
 
+  const notify = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(""), 3200);
+  }, []);
+
   useEffect(() => {
     let active = true;
 
     getComplaints()
       .then((complaints) => {
         if (!active) return;
-        console.log(
-          "Complaints loaded from API:",
-          complaints.map((complaint) => complaint.id),
-        );
-
-        const savedCases: DemoCase[] = complaints.map((complaint) => {
-          const description =
-            typeof complaint.description === "string"
-              ? complaint.description
-              : "";
-
-          return {
-            id: `DB-${complaint.id}`,
-            date: new Date(complaint.created_at).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            }),
-            language:
-              complaint.language === "en"
-                ? "English"
-                : complaint.language === "hi"
-                  ? "Hindi"
-                  : complaint.language,
-            status: "New",
-            assigned: "Unassigned",
-            score: 0,
-            priority: "Low",
-            summary: description.slice(0, 100),
-            narrative: description,
-            indicators: [],
-            notes:
-              "New complaint received via API. Awaiting human responder review.",
-            followUpDate: "Not scheduled",
-            history: ["Complaint submitted via API"],
-          };
-        });
-
         setCases((existing) => {
-          const demoCases = existing.filter(
-            (item) => !item.id.startsWith("DB-"),
-          );
-
-          return [...savedCases, ...demoCases];
+          return mergeSavedCases(complaints, existing);
         });
       })
-      .catch((error) => {
-        console.error("Failed to load saved complaints:", error);
+      .catch(() => {
+        if (active) {
+          notify(
+            "Saved cases could not be loaded. Check the backend and refresh.",
+          );
+        }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [notify]);
 
   const selectedCase = cases.find((item) => item.id === selectedId) ?? null;
-
-  const notify = (message: string) => {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 3200);
-  };
 
   const navigate = (next: View) => {
     setView(next);
@@ -173,7 +143,41 @@ useEffect(() => {
     id: string,
     updates: Partial<DemoCase>,
     historyMessage?: string,
-  ) => {
+  ): Promise<void> => {
+    if (id.startsWith("DB-")) {
+      const caseId = Number(id.slice(3));
+      if (!Number.isSafeInteger(caseId) || caseId <= 0) {
+        return Promise.reject(new Error("Invalid saved case identifier."));
+      }
+
+      return updateComplaint(caseId, {
+        ...(updates.status !== undefined ? { status: updates.status } : {}),
+        ...(updates.assigned !== undefined
+          ? { assigned: updates.assigned }
+          : {}),
+        ...(updates.notes !== undefined ? { notes: updates.notes } : {}),
+        ...(updates.score !== undefined
+          ? { rule_based_score: updates.score }
+          : {}),
+        ...(updates.priority !== undefined
+          ? { rule_based_priority: updates.priority }
+          : {}),
+        ...(updates.indicators !== undefined
+          ? { rule_based_indicators: updates.indicators }
+          : {}),
+        ...(historyMessage ? { history_message: historyMessage } : {}),
+      }).then((savedComplaint) => {
+        const persistedCase = complaintToDemoCase(savedComplaint);
+        setCases((existing) =>
+          existing.map((item) =>
+            item.id === id
+              ? { ...item, ...persistedCase }
+              : item,
+          ),
+        );
+      });
+    }
+
     setCases((existing) =>
       existing.map((item) =>
         item.id === id
@@ -190,6 +194,7 @@ useEffect(() => {
           : item,
       ),
     );
+    return Promise.resolve();
   };
 
   const addReferral = (referral: DemoReferral) =>

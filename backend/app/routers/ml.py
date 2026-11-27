@@ -2,6 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
+from app.schemas.ml import MLPredictionResponse
 from app.services.ml_inference import predict_text
 from app.core.dependencies import require_roles
 
@@ -16,11 +17,16 @@ class MLPredictionRequest(BaseModel):
     text: str = Field(min_length=1, max_length=20000)
 
 
+<<<<<<< Updated upstream
 @router.post("/predict")
 def predict(
     payload: MLPredictionRequest,
     current_user=Depends(require_roles("admin", "assessor")),
 ):
+=======
+@router.post("/predict", response_model=MLPredictionResponse)
+def predict(payload: MLPredictionRequest):
+>>>>>>> Stashed changes
     try:
         return predict_text(payload.text)
 

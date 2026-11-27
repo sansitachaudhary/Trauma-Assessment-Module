@@ -30,7 +30,6 @@ def analyze_dev_predictions():
     class_one_index = list(model.classes_).index(1)
 
     results = pd.DataFrame({
-        "Participant_ID": df["Participant_ID"],
         "actual_label": df["label"],
         "predicted_label": predictions,
         "class_0_probability": probabilities[:, list(model.classes_).index(0)],
@@ -45,34 +44,19 @@ def analyze_dev_predictions():
         ["class_0_probability", "class_1_probability"]
     ].max(axis=1)
 
+    summary = results.groupby("actual_label").agg(
+        participants=("actual_label", "size"),
+        accuracy=("correct_prediction", "mean"),
+        mean_class_1_probability=("class_1_probability", "mean"),
+        mean_prediction_confidence=("prediction_confidence", "mean"),
+    ).reset_index()
+
     output = Path(OUTPUT_PATH)
     output.parent.mkdir(parents=True, exist_ok=True)
-    results.to_csv(output, index=False)
+    summary.to_csv(output, index=False)
 
     print("Development prediction analysis")
-    print("Participants analyzed:", len(results))
-    print("Correct predictions:", results["correct_prediction"].sum())
-    print("Incorrect predictions:", (~results["correct_prediction"]).sum())
-
-    print("\nClass 1 probabilities by actual label:")
-    print(
-        results.groupby("actual_label")["class_1_probability"]
-        .describe()
-        .round(4)
-    )
-
-    print("\nIncorrect predictions:")
-    print(
-        results.loc[
-            ~results["correct_prediction"],
-            [
-                "Participant_ID",
-                "actual_label",
-                "predicted_label",
-                "class_1_probability",
-            ],
-        ].to_string(index=False)
-    )
+    print(summary.round(4).to_string(index=False))
 
     print("\nSaved:", output)
 

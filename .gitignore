@@ -34,6 +34,9 @@ backend/*.sqlite3
 # DAIC-WOZ dataset and downloaded participant data
 backend/ml/data/
 backend/ml/artifacts/
+# Participant-level predictions derived from restricted research data
+backend/ml/evaluation/results/cv_predictions*.csv
+backend/ml/evaluation/results/dev/prediction_analysis.csv
 **/*_P.zip
 **/*_TRANSCRIPT.csv
 
