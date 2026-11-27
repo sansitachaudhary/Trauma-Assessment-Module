@@ -1,12 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import "./dashboard.css";
-<<<<<<< Updated upstream
-import { useEffect, useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser, getToken, logout } from "../lib/auth-api";
 import type { CurrentUser } from "../lib/auth-api";
-=======
-import { useCallback, useEffect, useState } from "react";
->>>>>>> Stashed changes
+import { complaintToDemoCase } from "../lib/complaint-api";
 import {
   Bell,
   CheckCircle2,
